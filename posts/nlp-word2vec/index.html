@@ -59,7 +59,7 @@
 <meta name="keywords" content="Word2Vec">
 <meta property="og:type" content="article">
 <meta property="og:title" content="现代NLP的基石 - Word2Vec">
-<meta property="og:url" content="https://ethaniz.github.io/2019/09/word2vec/index.html">
+<meta property="og:url" content="https://ethaniz.github.io/posts/nlp-word2vec/index.html">
 <meta property="og:site_name" content="机器学习之道">
 <meta property="og:description" content="起源机器学习的各项算法，都可以简单理解为：一个向量vector，经过一个函数f(x)，结果得到另一个向量vector或者标量scalar。输入的这个向量，我们称之为样本sample，向量中的每一个值，代表了样本的每一维特征feature。这个向量一般是浮点数的，即dtype=np.float32。  在NLP的相关领域中，我们的样本往往是一段文本内容，如一个句子、一篇文章等等，我们不能把这些文本">
 <meta property="og:locale" content="en">
@@ -70,12 +70,12 @@
 <meta property="og:image" content="https://i.loli.net/2019/09/10/4x51QCPY9eBKwbc.png">
 <meta property="og:image" content="https://i.loli.net/2019/09/10/yjgV8NnSTFsY5eO.png">
 <meta property="og:image" content="https://i.loli.net/2019/09/10/PmEfvMoHG8NZQJw.png">
-<meta property="og:updated_time" content="2019-09-25T07:27:05.333Z">
+<meta property="og:updated_time" content="2019-09-25T10:25:14.215Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="现代NLP的基石 - Word2Vec">
 <meta name="twitter:description" content="起源机器学习的各项算法，都可以简单理解为：一个向量vector，经过一个函数f(x)，结果得到另一个向量vector或者标量scalar。输入的这个向量，我们称之为样本sample，向量中的每一个值，代表了样本的每一维特征feature。这个向量一般是浮点数的，即dtype=np.float32。  在NLP的相关领域中，我们的样本往往是一段文本内容，如一个句子、一篇文章等等，我们不能把这些文本">
 <meta name="twitter:image" content="https://i.loli.net/2019/09/10/cXgEFD47ewZpmoJ.png">
-  <link rel="canonical" href="https://ethaniz.github.io/2019/09/word2vec/">
+  <link rel="canonical" href="https://ethaniz.github.io/posts/nlp-word2vec/">
 
 
 <script id="page-configurations">
@@ -239,7 +239,7 @@
   
   
   <div class="post-block post">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/word2vec/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/nlp-word2vec/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -278,7 +278,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 15:27:05" itemprop="dateModified" datetime="2019-09-25T15:27:05+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:25:14" itemprop="dateModified" datetime="2019-09-25T18:25:14+08:00">2019-09-25</time>
               </span>
             
           
@@ -310,6 +310,8 @@
         <p><img src="https://i.loli.net/2019/09/10/cXgEFD47ewZpmoJ.png" alt="Zv8mc6ulBIVCneD.png"></p>
 <h2 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h2><p>机器学习的各项算法，都可以简单理解为：一个向量vector，经过一个函数f(x)，结果得到另一个向量vector或者标量scalar。输入的这个向量，我们称之为样本sample，向量中的每一个值，代表了样本的每一维特征feature。这个向量一般是浮点数的，即<code>dtype=np.float32</code>。 </p>
 <p>在NLP的相关领域中，我们的样本往往是一段文本内容，如一个句子、一篇文章等等，我们不能把这些文本直接喂给机器学习模型，而是要先把文本转换成浮点数的向量，即文本的向量化表示。这在NLP领域中是非常基础且重要的阶段，其结果可以用在文档搜索，网页搜索，垃圾邮件过滤，文本主题建模等等方面。</p>
+<a id="more"></a>
+
 <hr>
 <h2 id="BOW"><a href="#BOW" class="headerlink" title="BOW"></a>BOW</h2><p>在文本的向量话表示领域中，最早出现的方法是BOW（Bag Of Words），即词袋模型。这个模型利用onehot编码的思想，把每一个词看作是一个维度，然后一个文档或句子就可以表示成一个维度为N的向量，N为语料中词语的个数。每个维度具体的值，可以通过简单计数或者计算TF-IDF值来得出。实际方案可参考<code>Scikit Learn</code>的<code>CountVectorizer</code>和<code>TfidfVectorizer</code>。</p>
 <div align="center">
@@ -390,7 +392,7 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2019/07/web-topic-extractor/" rel="next" title="任意网页正文内容主题词提取">
+                <a href="/posts/web-topic-extractor/" rel="next" title="任意网页正文内容主题词提取">
                   <i class="fa fa-chevron-left"></i> 任意网页正文内容主题词提取
                 </a>
               
@@ -400,7 +402,7 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2019/09/neo4j-tutorial/" rel="prev" title="手把手教你快速入门知识图谱 - Neo4J教程">
+                <a href="/posts/knowledge-graph-neo4j-toturial/" rel="prev" title="手把手教你快速入门知识图谱 - Neo4J教程">
                   手把手教你快速入门知识图谱 - Neo4J教程 <i class="fa fa-chevron-right"></i>
                 </a>
               
@@ -420,6 +422,9 @@
 
           </div>
           
+    
+    <div class="comments" id="gitalk-container"></div>
+  
 
         </div>
           
@@ -600,6 +605,25 @@
   
 
   
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'cb5f02dcae7fb041a28a',
+      clientSecret: 'af1050d07337b233d629af013bda2856c23932a5',
+      repo: 'ethaniz.github.io',
+      owner: 'ethaniz',
+      admin: ['ethaniz'],
+      id: '11fe25dea11f152cb30ae386089250c4',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
 
 </body>
 </html>

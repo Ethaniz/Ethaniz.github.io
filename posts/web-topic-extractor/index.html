@@ -59,18 +59,18 @@
 <meta name="keywords" content="Topic Model,TFIDF">
 <meta property="og:type" content="article">
 <meta property="og:title" content="任意网页正文内容主题词提取">
-<meta property="og:url" content="https://ethaniz.github.io/2019/07/web-topic-extractor/index.html">
+<meta property="og:url" content="https://ethaniz.github.io/posts/web-topic-extractor/index.html">
 <meta property="og:site_name" content="机器学习之道">
 <meta property="og:description" content="前言网页正文内容主题提取，即任意给一个网页url，通过爬取网页内容和文本分析，得出该网页内容的关键词，作为网页的标签。这些关键词和标签在做流量分析_内容推荐方面有非常重要的意义。比如说我们做数字营销，用过页面来做用户引流，我们就可以知道吸引用户过来的点是什么，用户的潜在需求是什么；另外，针对内容社区的用户画像/推荐系统，关键点也是文章/页面的主题和标签。  这个任务涉及的技术点主要有以下几个：">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://i.loli.net/2019/09/10/cO3CQWLiAMSf8rX.png">
 <meta property="og:image" content="https://github.com/chrislinan/cx-extractor-python/raw/master/img/2.png">
-<meta property="og:updated_time" content="2019-09-25T07:19:44.544Z">
+<meta property="og:updated_time" content="2019-09-25T10:20:43.229Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="任意网页正文内容主题词提取">
 <meta name="twitter:description" content="前言网页正文内容主题提取，即任意给一个网页url，通过爬取网页内容和文本分析，得出该网页内容的关键词，作为网页的标签。这些关键词和标签在做流量分析_内容推荐方面有非常重要的意义。比如说我们做数字营销，用过页面来做用户引流，我们就可以知道吸引用户过来的点是什么，用户的潜在需求是什么；另外，针对内容社区的用户画像/推荐系统，关键点也是文章/页面的主题和标签。  这个任务涉及的技术点主要有以下几个：">
 <meta name="twitter:image" content="https://i.loli.net/2019/09/10/cO3CQWLiAMSf8rX.png">
-  <link rel="canonical" href="https://ethaniz.github.io/2019/07/web-topic-extractor/">
+  <link rel="canonical" href="https://ethaniz.github.io/posts/web-topic-extractor/">
 
 
 <script id="page-configurations">
@@ -234,7 +234,7 @@
   
   
   <div class="post-block post">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/07/web-topic-extractor/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/web-topic-extractor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -273,7 +273,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 15:19:44" itemprop="dateModified" datetime="2019-09-25T15:19:44+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:20:43" itemprop="dateModified" datetime="2019-09-25T18:20:43+08:00">2019-09-25</time>
               </span>
             
           
@@ -310,6 +310,8 @@
 <li><strong>正文提取</strong>。现在的web页面是非常复杂的，除了正文外，包含了大量的广告、导航、信息流等，我们需要去除干扰，只提取网页的正文信息。 </li>
 <li><strong>主题模型</strong> 。拿到正文文本后，就需要做NLP来提取主题关键字了。</li>
 </ol>
+<a id="more"></a>
+
 <hr>
 <h2 id="网页爬虫"><a href="#网页爬虫" class="headerlink" title="网页爬虫"></a>网页爬虫</h2><p>这里的网页爬虫和一般的爬虫还不太一样，会简单许多，主要是把原始网页的HTML抓下来即可，主要是为后续的分析挖掘打下基础，属于数据采集的阶段。 </p>
 <p>这里我们采用了Python的<code>requests</code>包。<code>requests</code>相对于Python自带的<code>urllib</code>来说，API更为人性化，鲁棒性也更好。</p>
@@ -391,7 +393,7 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2019/09/word2vec/" rel="prev" title="现代NLP的基石 - Word2Vec">
+                <a href="/posts/nlp-word2vec/" rel="prev" title="现代NLP的基石 - Word2Vec">
                   现代NLP的基石 - Word2Vec <i class="fa fa-chevron-right"></i>
                 </a>
               
@@ -411,6 +413,9 @@
 
           </div>
           
+    
+    <div class="comments" id="gitalk-container"></div>
+  
 
         </div>
           
@@ -591,6 +596,25 @@
   
 
   
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'cb5f02dcae7fb041a28a',
+      clientSecret: 'af1050d07337b233d629af013bda2856c23932a5',
+      repo: 'ethaniz.github.io',
+      owner: 'ethaniz',
+      admin: ['ethaniz'],
+      id: '819e2c90747362995bc0ddb66a75ea73',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
 
 </body>
 </html>

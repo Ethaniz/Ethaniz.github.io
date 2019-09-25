@@ -225,7 +225,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/numpy-pca-svd/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/numpy-pca-svd/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -239,7 +239,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2019/09/numpy-pca-svd/" class="post-title-link" itemprop="url">使用numpy来理解PCA和SVD</a>
+            <a href="/posts/numpy-pca-svd/" class="post-title-link" itemprop="url">使用numpy来理解PCA和SVD</a>
           
         </h1>
 
@@ -265,7 +265,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 16:21:13" itemprop="dateModified" datetime="2019-09-25T16:21:13+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:20:53" itemprop="dateModified" datetime="2019-09-25T18:20:53+08:00">2019-09-25</time>
               </span>
             
           
@@ -303,91 +303,15 @@
 <li>降维常用套路Principal Component Analysis</li>
 </ul>
 <p>LSA已经在前文中有所讲解，CF的话后面在推荐系统的专题中来写，今天主要聊聊PCA，以及SVD在PCA中的重要作用。同样延续我们“手撕”的传统，使用numpy来理解其中的原理。</p>
-<hr>
-<h2 id="PCA"><a href="#PCA" class="headerlink" title="PCA"></a>PCA</h2><p><a href="https://en.wikipedia.org/wiki/Principal_component_analysis" target="_blank" rel="noopener">Principal component analysis</a>即<strong>主成分分析</strong>，是机器学习中一种非常常用的降维方式。其发源也是源自于早期的计算机处理能力有限，当数据样本的维度很高时，预先去除掉数据中的一些冗余信息和噪声（降维），使得数据变得更加简单高效，节省时间和成本。 </p>
-<p>在深度学习时代，更强调的是原始数据的直接输入，再通过神经网络来做降维工作，最典型是场景就是计算机视觉，直接输入原始图片像素信息，通过CNN<strong>卷积层</strong>、<strong>MaxPooling层</strong>来进行降维。因此PCA逐渐开始淡出人们的视线，通常是作为一种数据可视化的手段（二维图表无法展示多维的数据样本）。 </p>
-<p>其实，在深度学习目前尚未全面攻克的结构化数据领域，PCA仍然有较多的用，其数据处理的思路依然值得我们去学习揣摩。 </p>
-<h3 id="PCA正常解法"><a href="#PCA正常解法" class="headerlink" title="PCA正常解法"></a>PCA正常解法</h3><p>PCA算法的本质，其实就是找到一些投影方向，使得数据在这些投影方向上的方差最大，且这些投影方向是相互正交的。找到新的<strong>正交基</strong>后，计算原始数据在这些正交基上<strong>投影</strong>的方差，方差越大，就说明对应正交基上包含了更多的信息量。 </p>
-<p>关于原始数据的方差，最好的一个工具就是<strong>协方差矩阵</strong>了。协方差矩阵的<strong>特征值</strong>越大，对应的方差也就越大，在对应的<strong>特征向量</strong>上投影的信息量就越大。因此，我们如果将小特征值对应方向的数据删除，就可以达到降维的目的。因此，在数学上，我们可以把问题转化为求原始数据的协方差矩阵，然后计算协方差矩阵的特征值与特征向量。 </p>
-<p>对于广大程序员来说，学习机器学习最重要的一个坎还是数学。很多实际的代码其实是公式推导后的结果的代码实现，如果没有理清公式推导的过程，那么最后肯定是一头雾水。所以，克服心中的恐惧，翻出压在箱底的《线性代数》，我们上。 </p>
-<p>首先，求原始数据X的协方差矩阵C，将原始矩阵中心化后，做如下操作</p>
-<div align="center">
-    <img width="120" height="80" src="https://i.loli.net/2019/09/23/UK4fEwg63QFB9Jq.png">
-</div>
-
-<p>接着，由于协方差矩阵C是方阵，就可以通过特征分解的方式来求C的特征值和特征向量。</p>
-<div align="center">
-    <img width="140" height="40" src="https://i.loli.net/2019/09/23/ZmnwjSJWsl89r4T.png">
-</div>
-
-<p>最后，选择最大的k个特征值进行保留，求X的k阶PCA（<strong>X右乘k阶特征向量</strong>）</p>
-<div align="center">
-    <img width="120" height="40" src="https://i.loli.net/2019/09/23/2dnGmzrZANiUIq5.png">
-</div>
-
-<h3 id="用SVD来解PCA"><a href="#用SVD来解PCA" class="headerlink" title="用SVD来解PCA"></a>用SVD来解PCA</h3><p>根据上面的推导，我们已经可以对矩阵X做PCA了。同学们可能要问了，这跟SVD有什么关系呢？ </p>
-<p>工程化思维强的同学应该已经想到了，这种纯数学的解法，在实际工程实践中有以下问题： </p>
-<ul>
-<li>在数据量很大时，把原始矩阵进行转置求协方差矩阵，然后再进行特征值分解是一个非常慢的过程。 </li>
-<li>稳定性问题。可以看到X转置乘以X，如果矩阵有非常小的数，很容易在平方中丢失。 </li>
-</ul>
-<p>工业界中，还是“<strong>唯快不破</strong>，<strong>唯稳不破</strong>”。我们知道，奇异值分解相对特征分解，有个很大的优势就是不要求原始矩阵是方阵。这非常符合现实生活中的数据。因此，有大神想到，是否可以用svd来解PCA？推导如下： </p>
-<p>我们根据协方差矩阵的公式，把X按照奇异值分解展开，注意后面应用到了一个<strong>酋矩阵</strong>(unitary)的特性：</p>
-<div align="center">
-    <img width="400" height="260" src="https://i.loli.net/2019/09/23/MExt5oDK7NiFUca.png">
-</div>
-
-<p>看到最后的结果，是否跟上面的</p>
-<div align="center">
-    <img width="140" height="38" src="https://i.loli.net/2019/09/23/ZmnwjSJWsl89r4T.png">
-</div>
-
-<p>很像？没错。协方差矩阵C的特征值和X的奇异值有以下关系</p>
-<div align="center">
-    <img width="140" height="76" src="https://i.loli.net/2019/09/23/fAr1CLG42UbenPm.png">
-</div>
-
-<p>而<strong>C的特征向量即为X的SVD分解后的V向量</strong>, 则参考PCA正常解法，X的k阶PCA即为_X右乘k阶V向量_。因此这种方式求PCA，只需要把原始矩阵做一次SVD分解即可，不用转置，不用求协方差矩阵。事实上，在<code>Scikit Learn</code>等机器学习框架中，就是用的SVD来做PCA。</p>
-<hr>
-<h2 id="用numpy来验证"><a href="#用numpy来验证" class="headerlink" title="用numpy来验证"></a>用numpy来验证</h2><h3 id="numpy原始解法求PCA"><a href="#numpy原始解法求PCA" class="headerlink" title="numpy原始解法求PCA"></a>numpy原始解法求PCA</h3><p>接下来，我们用numpy来验证这种思路。首先是PCA的标准解法： 随机模拟一个原始数据矩阵，5个样本，3个特征：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">X = np.random.rand(<span class="number">5</span>,<span class="number">3</span>)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([[0.86568791, 0.73022945, 0.17982869],</span></span><br><span class="line"><span class="string">       [0.07201287, 0.99358411, 0.84389196],</span></span><br><span class="line"><span class="string">       [0.61267696, 0.08867997, 0.11770573],</span></span><br><span class="line"><span class="string">       [0.16898969, 0.3093472 , 0.9010064 ],</span></span><br><span class="line"><span class="string">       [0.43840269, 0.97250927, 0.64897872]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>将矩阵中心化，即减去均值：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">X_new = X - np.mean(X, axis=<span class="number">0</span>)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([[ 0.43413389,  0.11135945, -0.35845361],</span></span><br><span class="line"><span class="string">       [-0.35954115,  0.37471411,  0.30560966],</span></span><br><span class="line"><span class="string">       [ 0.18112294, -0.53019003, -0.42057657],</span></span><br><span class="line"><span class="string">       [-0.26256433, -0.3095228 ,  0.3627241 ],</span></span><br><span class="line"><span class="string">       [ 0.00684866,  0.35363927,  0.11069642]])</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># 确保结果正确，即转换后均值为0</span></span><br><span class="line">np.allclose(X_new.mean(axis=<span class="number">0</span>), np.zeros(X_new.shape[<span class="number">1</span>]))</span><br></pre></td></tr></table></figure>
-
-<p>求X_new的协方差矩阵C</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">C = np.dot(X_new.T, X_new) / (X_new.shape[<span class="number">0</span>] - <span class="number">1</span>)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">C</span></span><br><span class="line"><span class="string">array([[ 0.10488363, -0.02467955, -0.10903811],</span></span><br><span class="line"><span class="string">       [-0.02467955,  0.16369454,  0.05611495],</span></span><br><span class="line"><span class="string">       [-0.10903811,  0.05611495,  0.13564834]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>求C的特征值和特征向量，这里用的是numpy的特征分解函数</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">eig_vals, eig_vecs = np.linalg.eig(C)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">eig_vals</span></span><br><span class="line"><span class="string">array([0.26474535, 0.00779743, 0.13168373])</span></span><br><span class="line"><span class="string">eig_vecs</span></span><br><span class="line"><span class="string">array([[-0.53801107,  0.72610049, -0.42816139],</span></span><br><span class="line"><span class="string">       [ 0.50584138, -0.12820944, -0.85304562],</span></span><br><span class="line"><span class="string">       [ 0.67429117,  0.67552974,  0.29831358]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>求X的PCA结果，就是X右乘k阶特征向量。这里k还是取的3。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">X_pca = np.dot(X_new, eig_vecs)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([[-0.41894072,  0.05880142, -0.38780564],</span></span><br><span class="line"><span class="string">       [ 0.58905292, -0.10265648, -0.07453908],</span></span><br><span class="line"><span class="string">       [-0.64922927, -0.08462316,  0.24926273],</span></span><br><span class="line"><span class="string">       [ 0.22927473,  0.09406657,  0.4846625 ],</span></span><br><span class="line"><span class="string">       [ 0.24984234,  0.03441165, -0.27158052]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="numpy的SVD求PCA"><a href="#numpy的SVD求PCA" class="headerlink" title="numpy的SVD求PCA"></a>numpy的SVD求PCA</h3><p>首先，直接求X_new的SVD，同样使用numpy的函数</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注意这里的Vh其实是公式中的VT</span></span><br><span class="line">U, Sigma, Vh = np.linalg.svd(X_new, full_matrices=<span class="literal">False</span>, compute_uv=<span class="literal">True</span>)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">U</span></span><br><span class="line"><span class="string">array([[-0.40710685,  0.53434046,  0.33295236,  0.59843699, -0.28241844],</span></span><br><span class="line"><span class="string">       [ 0.57241386,  0.10270414, -0.58127362,  0.5471169 , -0.15677466],</span></span><br><span class="line"><span class="string">       [-0.63089041, -0.34344824, -0.47916326,  0.32579597,  0.38507162],</span></span><br><span class="line"><span class="string">       [ 0.22279838, -0.66779531,  0.53263483,  0.46842625,  0.03587876],</span></span><br><span class="line"><span class="string">       [ 0.24278501,  0.37419895,  0.19484969,  0.13026931,  0.86376738]])</span></span><br><span class="line"><span class="string">Sigma</span></span><br><span class="line"><span class="string">array([1.02906823, 0.72576506, 0.17660612])</span></span><br><span class="line"><span class="string">Vh</span></span><br><span class="line"><span class="string">array([[-0.53801107,  0.50584138,  0.67429117],</span></span><br><span class="line"><span class="string">       [ 0.42816139,  0.85304562, -0.29831358],</span></span><br><span class="line"><span class="string">       [ 0.72610049, -0.12820944,  0.67552974]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>我们来根据上面的公式，确认下eig_vals和S的关系，注意在numpy的实现中，特征值和奇异值的排序是不同的</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">np.allclose(eig_vals, np.square(S) / (X_new.shape[<span class="number">0</span>] - <span class="number">1</span>))</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">eig_vals</span></span><br><span class="line"><span class="string">array([0.26474535, 0.00779743, 0.13168373])</span></span><br><span class="line"><span class="string">np.square(S) / (X_new.shape[0] - 1)</span></span><br><span class="line"><span class="string">array([0.26474535, 0.13168373, 0.00779743])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>从结果看出，确实跟公式是一致的。 接下来用SVD求PCA就简单了，直接右乘V即可。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注意Vh是公式中的VT，因此V=Vh.T</span></span><br><span class="line">X_pca_svd = np.dot(X_new, Vh.T)</span><br><span class="line"><span class="comment"># X_pca_svd = np.dot(U, np.diag(Sigma))</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">X_pca_svd</span></span><br><span class="line"><span class="string">array([[-0.41894072,  0.38780564,  0.05880142],</span></span><br><span class="line"><span class="string">       [ 0.58905292,  0.07453908, -0.10265648],</span></span><br><span class="line"><span class="string">       [-0.64922927, -0.24926273, -0.08462316],</span></span><br><span class="line"><span class="string">       [ 0.22927473, -0.4846625 ,  0.09406657],</span></span><br><span class="line"><span class="string">       [ 0.24984234,  0.27158052,  0.03441165]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>求出结果后，正当我们信心满满的对比一下<code>X_pca</code>和<code>X_pca_svd</code>,以为大功告成打完收工时，却发现二者是不一致的。WTF？ </p>
-<h3 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h3><p>仔细研究下<code>X_pca</code>和<code>X_pca_svd</code>的结果，可以看出，排除特征值和奇异值的排序导致的列向量顺序不同外，部分列向量的绝对值相同但正负不同。 </p>
-<p>问题出在哪里？我们搬出<code>Scikit Learn</code>，再来算一次PCA：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.decomposition <span class="keyword">import</span> PCA</span><br><span class="line"></span><br><span class="line">pca = PCA(<span class="number">3</span>)</span><br><span class="line">pca.fit_transform(X)   <span class="comment"># sklearn自动处理去均值化</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([[ 0.41894072, -0.38780564, -0.05880142],</span></span><br><span class="line"><span class="string">       [-0.58905292, -0.07453908,  0.10265648],</span></span><br><span class="line"><span class="string">       [ 0.64922927,  0.24926273,  0.08462316],</span></span><br><span class="line"><span class="string">       [-0.22927473,  0.4846625 , -0.09406657],</span></span><br><span class="line"><span class="string">       [-0.24984234, -0.27158052, -0.03441165]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>嗯，也是绝对值相同但正负不同。都说<code>Scikit Learn</code>的PCA就是SVD做的，难道是骗人的？ 好在代码不会骗人，我们直接翻出源码。</p>
-<p>通过研究<code>Scikit Learn</code>的源码<a href="https://github.com/scikit-learn/scikit-learn/blob/4c65d8e615c9331d37cbb6225c5b67c445a5c959/sklearn/utils/extmath.py#L609" target="_blank" rel="noopener">svd_flip@scikit-learn/extmath.py</a>找到了答案： SVD奇异值分解的结果是唯一的，但是分解出来的U矩阵和V矩阵的正负可以不是唯一，只要保证它们乘起来是一致的就行。因此，sklearn为了保证svd分解结果的一致性，它们的方案是：保证U矩阵的每一行(<code>u_i</code>)中，绝对值最大的元素一定是正数，否则将<code>u_i</code>转成<code>-u_i</code>,并将相应的<code>v_i</code>转成<code>-v_i</code>已保证结果的一致。 </p>
-<p>这又是数学与工程的问题了。在数学上，几种结果都是正确的。但是在工程上，有个很重要的特性叫<strong>幂等性</strong>(Idempotence)。</p>
-<blockquote>
-<p>Methods can also have the property of “idempotence” in that (aside from error or expiration issues) the side-effects of N &gt; 0 identical requests is the same as for a single request.</p>
-</blockquote>
-<p>这是源自于HTTP规范中的一个概念，可以引申至各种分布式服务的设计当中，即：高质量的服务，一次请求和多次请求，其副作用（结果）应当是一致的。<code>Scikit Learn</code>正是通过<code>svd_flip</code>这个函数，把一个数学上并不幂等的操作，转化成了幂等的服务，其设计之讲究可见一斑。</p>
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文通过公式推导和numpy代码实战，展示了PCA的正常解法，以及工业界常用的SVD解法，并最后引申至数学和实现的一些探讨。“part-science, part-art”，这就是我最喜爱的机器学习之道</p>
-
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/numpy-pca-svd/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
@@ -411,7 +335,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/return-sequences-keras/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/keras-return-sequences-return-state/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -425,7 +349,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2019/09/return-sequences-keras/" class="post-title-link" itemprop="url">Keras中return_sequences和return_state有什么用？</a>
+            <a href="/posts/keras-return-sequences-return-state/" class="post-title-link" itemprop="url">Keras中return_sequences和return_state有什么用？</a>
           
         </h1>
 
@@ -451,7 +375,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 15:13:49" itemprop="dateModified" datetime="2019-09-25T15:13:49+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:22:23" itemprop="dateModified" datetime="2019-09-25T18:22:23+08:00">2019-09-25</time>
               </span>
             
           
@@ -484,64 +408,15 @@
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CNN和RNN，作为深度学习的两大护法，促进了深度学习近几年在Computer Vision、NLP等领域席卷全世界。相比CNN，RNN其实更为“骨骼精奇”，它开创性的递归网络结构，让模型具有了“记忆”，使得我们向着“AI”更近了一步。虽然最近各种Transformer结构有了超越RNN之势，但是我依然觉得RNN是非常值得学习和发展的。</p>
 <p>今天，我们以LSTM为例，来谈一个RNN中的一个具体的问题。我们知道，在Keras的LSTM实现中，有两个参数<code>return_sequences</code>和<code>return_state</code>。这两个参数的实际意义是什么？在什么场景下会用到呢？</p>
 <p>PS：<code>Keras</code>是我最喜爱的深度学习框架了，其API的设计非常精妙和优雅，François Chollet是不愧是大师中的大师。相比传统的<code>Tensorflow</code>和<code>PyTorch</code>，Keras的API才是真正的“Deep Learning for Human”。另外，看到<code>Tensorflow 2.0</code>也开始以<code>tf.keras</code>作为第一公民，我非常欣慰。关于我对这几个框架的理解，后面再以专题文章和大家分享。</p>
-<hr>
-<h2 id="LSTM介绍"><a href="#LSTM介绍" class="headerlink" title="LSTM介绍"></a>LSTM介绍</h2><blockquote>
-<p>Long Short Term Memory networks – usually just called “LSTMs” – are a special kind of RNN, capable of learning long-term dependencies. They were introduced by <a href="http://www.bioinf.jku.at/publications/older/2604.pdf" target="_blank" rel="noopener">Hochreiter &amp; Schmidhuber (1997)</a> , and were refined and popularized by many people in following work.They work tremendously well on a large variety of problems, and are now widely used.</p>
-</blockquote>
-<p>LSTM是为了解决普通RNN网络在实际实践中出现的“梯度消失”等问题而出现的。这里我们略过里面的细节，重点看看单个LSTM cell的输入输出情况。<br><img src="https://i.loli.net/2019/09/19/k4U3AgjmeE97x8y.jpg" alt><br>从上图可以看出，单个LSTM cell其实有2个输出的，一个是h(t)，一个是c(t)。这里的h(t)称为hidden state，c(t)称为cell state。这个命名其实我认为是不太好的。熟悉全连接神经网络的同学，一定会把h(t)跟hidden layer相混淆。其实，这个h(t)才是LSTM的真正output，c(t)才是LSTM的内部”隐藏”状态。 </p>
-<p>我们进一步把LSTM网络展开来看。每一个时间节点timestep，输入一个x(t)，cell里面的c(t)做一次更新，输出h(t)。紧接着下一个timestep，x(t+1)、h(t)和c(t)继续输入到cell，输出为h(t+1)和c(t+1)，如下图。<br><img src="https://i.loli.net/2019/09/19/4PMajuzCGpyShWt.png" alt><br>因此，Keras中的<code>return_sequences</code>和<code>return_state</code>，就是跟h(t)和c(t)相关。</p>
-<hr>
-<h2 id="Return-Sequences"><a href="#Return-Sequences" class="headerlink" title="Return Sequences"></a>Return Sequences</h2><p>接下来我们来点hands-on的代码，来具体看看这两个参数的作用。 </p>
-<h3 id="实验一"><a href="#实验一" class="headerlink" title="实验一"></a>实验一</h3><p>试验代码中，<code>return_sequences</code>和<code>return_state</code>默认都是false，输入shape为(1,3,1)，表示1个batch，3个timestep，1个feature</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Model</span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Input</span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> LSTM</span><br><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> array</span><br><span class="line"><span class="comment"># define model</span></span><br><span class="line">inputs1 = Input(shape=(<span class="number">3</span>, <span class="number">1</span>))</span><br><span class="line">lstm1 = LSTM(<span class="number">1</span>)(inputs1)</span><br><span class="line">model = Model(inputs=inputs1, outputs=lstm1)</span><br><span class="line"><span class="comment"># define input data</span></span><br><span class="line">data = array([<span class="number">0.1</span>, <span class="number">0.2</span>, <span class="number">0.3</span>]).reshape((<span class="number">1</span>,<span class="number">3</span>,<span class="number">1</span>))</span><br><span class="line"><span class="comment"># make and show prediction</span></span><br><span class="line">print(model.predict(data))</span><br></pre></td></tr></table></figure>
-
-<p>输出结果为</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[[<span class="number">-0.0953151</span>]]</span><br></pre></td></tr></table></figure>
-
-<p>表示在经历了3个time step的输入后，LSTM返回的hidden state，也就是上文中的h(t)。由于输出的是网络最后一个timestep的值，因此结果是一个标量。 </p>
-<h3 id="实验二"><a href="#实验二" class="headerlink" title="实验二"></a>实验二</h3><p>我们加上参数<code>return_sequences=True</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lstm1 = LSTM(<span class="number">1</span>, return_sequences=<span class="literal">True</span>)(inputs1)</span><br></pre></td></tr></table></figure>
-
-<p>输出结果为</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[[[<span class="number">-0.02243521</span>]</span><br><span class="line">[<span class="number">-0.06210149</span>]</span><br><span class="line">[<span class="number">-0.11457888</span>]]]</span><br></pre></td></tr></table></figure>
-
-<p>我们看到，输出了一个array，长度等于timestep，表示网络输出了每个timestep的h(t)。</p>
-<p>总结一下，<code>return_sequences</code>即表示，LSTM的输出h(t)，是输出最后一个timestep的h(t)，还是把所有timestep的h(t)都输出出来。在实际应用中，关系到网络的应用场景是many-to-one还是many-to-many，非常重要。</p>
-<hr>
-<h2 id="Return-State"><a href="#Return-State" class="headerlink" title="Return State"></a>Return State</h2><h3 id="实验三"><a href="#实验三" class="headerlink" title="实验三"></a>实验三</h3><p>接下来我们继续实验<code>return_state</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lstm1, state_h, state_c = LSTM(<span class="number">1</span>, return_state=<span class="literal">True</span>)(inputs1)</span><br></pre></td></tr></table></figure>
-
-<p>输出结果为</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[array([[ <span class="number">0.10951342</span>]], dtype=float32),</span><br><span class="line"> array([[ <span class="number">0.10951342</span>]], dtype=float32),</span><br><span class="line"> array([[ <span class="number">0.24143776</span>]], dtype=float32)]</span><br></pre></td></tr></table></figure>
-
-<p>注意，输出是一个列表list，分别表示</p>
-<ul>
-<li>最后一个time step的hidden state</li>
-<li>最后一个time step的hidden state（跟上面一样)</li>
-<li>最后一个time step的cell state（注意就是上文中的c(t)） </li>
-</ul>
-<p>可以看出，<code>return_state</code>就是控制LSTM中的c(t)输出与否。 </p>
-<h3 id="实验四"><a href="#实验四" class="headerlink" title="实验四"></a>实验四</h3><p>我们最后看看<code>return_sequences</code>和<code>return_state</code>全开的情况。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lstm1, state_h, state_c = LSTM(<span class="number">1</span>, return_sequences=<span class="literal">True</span>, return_state=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
-
-<p>输出结果为</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[array([[[<span class="number">-0.02145359</span>],</span><br><span class="line">         [<span class="number">-0.0540871</span> ],</span><br><span class="line">         [<span class="number">-0.09228823</span>]]], dtype=float32),</span><br><span class="line"> array([[<span class="number">-0.09228823</span>]], dtype=float32),</span><br><span class="line"> array([[<span class="number">-0.19803026</span>]], dtype=float32)]</span><br></pre></td></tr></table></figure>
-
-<p>输出列表的意义其实跟上面实验三一致，只是第一个hidden state h(t)变成了所有timestep的，因此也是长度等于timestep的array。</p>
-<hr>
-<h2 id="Time-Distributed"><a href="#Time-Distributed" class="headerlink" title="Time Distributed"></a>Time Distributed</h2><p>最后再讲一讲<code>Keras</code>中的<code>TimeDistributed</code>。这个也是在RNN中非常常用但比较难理解的概念，原作者解释说</p>
-<blockquote>
-<p>TimeDistributedDense applies a same Dense (fully-connected) operation to every timestep of a 3D tensor. </p>
-</blockquote>
-<p>其实它的主要用途在于Many-to-Many： 比如输入shape为(1, 5, 1)，输出shape为(1, 5, 1)</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">model = Sequential()</span><br><span class="line">model.add(LSTM(<span class="number">3</span>, input_shape=(length, <span class="number">1</span>), return_sequences=<span class="literal">True</span>))</span><br><span class="line">model.add(TimeDistributed(Dense(<span class="number">1</span>)))</span><br></pre></td></tr></table></figure>
-
-<p>根据上面解读，<code>return_sequences=True</code>，使得LSTM的输出为每个timestep的hidden state，shape为(1, 5, 3) </p>
-<p>现在需要将这个(1 ,5, 3)的3D tensor变换为(1, 5, 1)的结果，需要3个Dense layer，分别作用于每个time step的输出。而使用了<code>TimeDistributed</code>后，则把一个相同的Dense layer去分别作用，可以使得网络更为紧凑，参数更少的作用。</p>
-<p>如果是在many-to-one的情况，<code>return_sequence=False</code>，则LSTM的输出为最后一个time step的hidden state，shape为(1, 3)。此时加上一个Dense layer, 不用使用<code>TimeDistributed</code>，就可以将(1, 3)变换为(1, 1)。</p>
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要通过一些实际的代码案例，解释了<code>Keras</code>的LSTM API中常见的两个参数<code>return_sequence</code>和<code>return_state</code>的原理及作用，在<code>Tensorflow</code>及<code>PyTorch</code>，也有相通的，希望能够帮助大家加深对RNN的理解。</p>
-
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/keras-return-sequences-return-state/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
@@ -565,7 +440,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/numpy-naive-bayes/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/numpy-naive-bayes/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -579,7 +454,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2019/09/numpy-naive-bayes/" class="post-title-link" itemprop="url">numpy“手撕”朴素贝叶斯</a>
+            <a href="/posts/numpy-naive-bayes/" class="post-title-link" itemprop="url">numpy“手撕”朴素贝叶斯</a>
           
         </h1>
 
@@ -605,7 +480,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 15:00:26" itemprop="dateModified" datetime="2019-09-25T15:00:26+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:24:24" itemprop="dateModified" datetime="2019-09-25T18:24:24+08:00">2019-09-25</time>
               </span>
             
           
@@ -635,102 +510,15 @@
 
       
           <p><img src="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg" alt><br>常见的python朴素贝叶斯算法的方式，都是使用<code>for循环</code>来统计各个<code>p(特征|类型)</code>的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即<strong>vectorization</strong>。通过各种矩阵运算来去除<code>for循环</code>，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来<strong>手撕</strong>朴素贝叶斯算法，带你领略机器学习中的向量化之道。</p>
-<hr>
-<h2 id="数据准备"><a href="#数据准备" class="headerlink" title="数据准备"></a>数据准备</h2><p>为了demo方便，我们先伪造一些数据。这里伪造的是NLP情感分类的数据。分为两部门<code>train</code>和<code>valid</code>，标签分为1和0，1代表侮辱性文字，0代表正常言论。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">train = [<span class="string">'my dog had flea problems help help please'</span>,</span><br><span class="line">        <span class="string">'mybe not take him to dog park stupid dog'</span>,</span><br><span class="line">        <span class="string">'my dalmation is so cute I love him'</span>,</span><br><span class="line">        <span class="string">'stop posting stupid worthless garbage'</span>,</span><br><span class="line">        <span class="string">'mr licks ate my steak how to stop him'</span>,]</span><br><span class="line">valid = [<span class="string">'my stupid stupid worthless dog'</span>]</span><br><span class="line">label = [<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>]</span><br><span class="line">valid_y = [<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="数据预处理"><a href="#数据预处理" class="headerlink" title="数据预处理"></a>数据预处理</h2><p>NLP的数据预处理主要就是词典的创建和文本的向量化。这里由于是英语文档，不存在分词的问题。 </p>
-<p>这里由于是<strong>手撕</strong>教程，不使用<code>spacy</code>等高阶NLP库，词典创建的也即使用Python的<code>set</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vocab = set([])</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> train:</span><br><span class="line">    vocab = vocab | set(doc.split())</span><br><span class="line">vocabList = list(vocab)</span><br><span class="line"><span class="comment"># 根据词反查index</span></span><br><span class="line">vocabList.index(<span class="string">'please'</span>)</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="文档向量化"><a href="#文档向量化" class="headerlink" title="文档向量化"></a>文档向量化</h2><p>向量话的原理，首先将文档中句子的每一个单词按照字典转换为<code>index</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">train_vec = []</span><br><span class="line">valid_vec = []</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> train:</span><br><span class="line">    train_vec.append([vocabList.index(x) <span class="keyword">for</span> x <span class="keyword">in</span> doc.split()])</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> valid:</span><br><span class="line">    valid_vec.append([vocabList.index(x) <span class="keyword">for</span> x <span class="keyword">in</span> doc.split()])</span><br></pre></td></tr></table></figure>
-
-<p>可以看看向量化后的结果</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">train_vec, valid_vec</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">[[28, 11, 16, 7, 26, 19, 19, 8],</span></span><br><span class="line"><span class="string">  [20, 24, 21, 14, 6, 11, 12, 22, 11],</span></span><br><span class="line"><span class="string">  [28, 5, 9, 25, 0, 3, 2, 14],</span></span><br><span class="line"><span class="string">  [1, 17, 22, 15, 13],</span></span><br><span class="line"><span class="string">  [18, 4, 27, 28, 10, 23, 6, 1, 14]],</span></span><br><span class="line"><span class="string"> [[28, 22, 22, 15, 11]]</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>接着是将词典的每一个单词作为一个feature维度处理，将所有文档处理成相同维度的矩阵，维度大小即为词典的长度，而每个维度的值有多种处理方式，比如按照句子中每个单词的<code>Count</code>计数，或者是每个单词的<code>TFIDF</code>值。这里我们采用了<code>Count</code>，为了体现手撕，使用了Python的<code>Counter</code>，为了体现numpy矩阵运算的思路，使用了<code>scipy</code>的稀疏矩阵<code>sparse.csr_matrix</code>。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line"><span class="keyword">from</span> scipy.sparse <span class="keyword">import</span> csr_matrix</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_term_doc_matrix</span><span class="params">(label_list, vocab_len)</span>:</span></span><br><span class="line">    j_indices = []</span><br><span class="line">    indptr = []</span><br><span class="line">    values = []</span><br><span class="line">    indptr.append(<span class="number">0</span>)</span><br><span class="line">    <span class="keyword">for</span> i, doc <span class="keyword">in</span> enumerate(label_list):</span><br><span class="line">        feature_counter = Counter(doc)</span><br><span class="line">        j_indices.extend(feature_counter.keys())</span><br><span class="line">        values.extend(feature_counter.values())</span><br><span class="line">        indptr.append(len(j_indices))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> csr_matrix((values, j_indices, indptr),</span><br><span class="line">                      shape=(len(indptr) - <span class="number">1</span>, vocab_len), dtype=int)</span><br><span class="line">train_matrix = get_term_doc_matrix(train_vec, len(vocabList)</span><br><span class="line">valid_matrix = get_term_doc_matrix(valid_vec, len(vocabList)</span><br></pre></td></tr></table></figure>
-
-<p>可以看看矩阵化后的train和valid，分别转换成了samples*feature，29即为字典的维度。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">train_matrix, valid_matrix</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&lt;5x29 sparse matrix of type ''</span></span><br><span class="line"><span class="string">    with 37 stored elements in Compressed Sparse Row format&gt;,</span></span><br><span class="line"><span class="string"> &lt;1x29 sparse matrix of type ''</span></span><br><span class="line"><span class="string">    with 4 stored elements in Compressed Sparse Row format&gt;</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>我们将生成的<strong>train_matrix</strong>作图如下（为方便观看省去了部分维度） <img src="https://i.loli.net/2019/09/18/NqnoSiWPHYjQtMX.png" alt></p>
-<hr>
-<h2 id="朴素贝叶斯算法原理"><a href="#朴素贝叶斯算法原理" class="headerlink" title="朴素贝叶斯算法原理"></a>朴素贝叶斯算法原理</h2><p>谈到朴素贝叶斯算法，首先想到的必定是著名的贝叶斯公式</p>
-<div align="center">
-    <img width="180" height="50" src="https://i.loli.net/2019/09/18/csVKXzDdkyUjTCe.png">
-</div>
-
-<p>不过这个定理如何体现到我们机器学习的场景呢？我们把其中的A和B换成实际的物理意义如下：</p>
-<div align="center">
-    <img width="260" height="50" src="https://i.loli.net/2019/09/18/DFhVYkycGtBMqn1.png">
-</div>
-
-<p>在我们的分类监督学习中，其实就是求在一定特征的样本情况下，某个具体类别的概率。根据贝叶斯公式，可以转换成分别求某个类别下这些特征的概率、某类别的概率、特征的概率。 </p>
-<p>实际场景中，特征一般是多维的，而多维特征的联合概率是比较复杂的。这时候，就体现出<strong>朴素</strong>的概念了。我们对样本作出假设：样本中的各个特征是相互独立的。这样，可以将联合概率转换成以下的独立概率乘积：</p>
-<div align="center">
-    <img width="400" height="50" src="https://i.loli.net/2019/09/18/qnkCiwJZOoQ38cN.png">
-</div>
-
-<p>当然，这种假设肯定是粗暴的。但是实践过程中，计算量减少带来的益处是远大于粗暴假设带来的失真。这也是最考验算法工程师的地方，既要考虑数学的严谨，同时也要考虑工程实现。“part-science, part-art”，这或许也是机器学习之道。 </p>
-<p>当然，对于模型最终的应用来说，求出具体的概率绝对值是意义不大的。我们只需要知道不同特征之间概率的比值就行。也就是说，对于二分类问题，我们只需要知道：</p>
-<div align="center">
-    <img width="200" height="35" src="https://i.loli.net/2019/09/18/epkhS8ERY1ZojJW.png">
-</div>
-
-<p>就可以判断出该样本是属于类别1。于是，我们可以接着进行公式变换，将<code>P(类别2|特征)</code>移到等式左边，并取<code>log</code>：</p>
-<div align="center">
-    <img width="160" height="50" src="https://i.loli.net/2019/09/18/IXNefSRnYoDg1lG.png">
-</div>
-
-<p>同样，根据<strong>朴素</strong>的假设，可以得到：</p>
-<div align="center">
-    <img width="500" height="50" src="https://i.loli.net/2019/09/18/56NqZVUmjdJwEiR.png">
-</div>
-<div align="center">
-    <img width="550" height="50" src="https://i.loli.net/2019/09/18/TU54BwvQYNfyH39.png">
-</div>
-
-<p>即，我们需要求出每个特征对应的</p>
-<div align="center">
-    <img width="150" height="50" src="https://i.loli.net/2019/09/18/32Of1FcLKThWBij.png">
-</div>
-
-<p>以及每个类别对应的</p>
-<div align="center">
-    <img width="80" height="50" src="https://i.loli.net/2019/09/18/PvLX4c8B13m2IbJ.png">
-</div>
-
-<p>然后全部相加，看结果是否大于0即可判断出样本的类别。而这两块，我们都是可以从训练样本中求出（先验概率），这也就是朴素贝叶斯算法训练的部分。</p>
-<hr>
-<p>##朴素贝叶斯矩阵运算</p>
-<p>前言中说到，一般的教程，直接使用<code>for循环</code>数数一般就可以求出上述的两个log值，完成“训练”。我们这样，要充分应用numpy的矩阵运算特性，不使用<code>for循环</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">p1 = np.squeeze(np.asarray(train_matrix[np.asarray(label==<span class="number">1</span>].sum(<span class="number">0</span>)))</span><br><span class="line">p0 = np.squeeze(np.asarray(train_matrix[np.asarray(label==<span class="number">0</span>].sum(<span class="number">0</span>)))</span><br><span class="line">pr1 = (p1+<span class="number">1</span>) / ((np.asarray(label)==<span class="number">1</span>).sum() + <span class="number">1</span>)</span><br><span class="line">pr0 = (p0+<span class="number">1</span>) / ((np.asarray(label)==<span class="number">0</span>).sum() + <span class="number">1</span>)</span><br><span class="line">r = np.log(pr1/pr0)</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://i.loli.net/2019/09/18/usVptoylQwMiZGh.png" alt><br>还是以这个图为例，<code>pr1</code>即为类别为1的样本中特征x的概率。在NLP中，每个特征都是一个词，其物理意义就是某个词在某个类别中出现的概率，而最后求出的<code>r</code>即为所有特征的概率在2个类别的比值，注意，这里的<code>r</code>是个向量，是通过样本之间的矩阵运算一次性求出。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">r</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([-0.40546511,  0.28768207, -0.40546511, -0.40546511,-0.40546511,</span></span><br><span class="line"><span class="string">       -0.40546511,  0.28768207, -0.40546511, -0.40546511, -0.40546511,</span></span><br><span class="line"><span class="string">       -0.40546511,  0.69314718,  0.98082925,  0.98082925, -0.11778304,</span></span><br><span class="line"><span class="string">        0.98082925, -0.40546511,  0.98082925, -0.40546511, -0.81093022,</span></span><br><span class="line"><span class="string">        0.98082925,  0.98082925,  1.38629436, -0.40546511,  0.98082925,</span></span><br><span class="line"><span class="string">       -0.40546511, -0.40546511, -0.40546511, -1.09861229])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>接下来求第二个log，这个直接就是不同类别的比例。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">b = np.log((np.asarray(label)==<span class="number">1</span>).mean() / (np.asarra(label)==<span class="number">0</span>).mean())</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">-0.4054651081081643</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>这里的<code>r</code>和<code>b</code>即为我们训练出的模型的参数。可以将其序列化到磁盘，供后续预测的时候使用（也就是深度学习中的inference）。</p>
-<hr>
-<h2 id="朴素贝叶斯推理"><a href="#朴素贝叶斯推理" class="headerlink" title="朴素贝叶斯推理"></a>朴素贝叶斯推理</h2><p>由于<code>r</code>代表了训练样本中每一个特征词的在不同类别的概率比值，比如’stupid’等词就很高，而’love’等词就较低。在实际应用中，我们同样取出预测样本中的所有词，然后考虑这些词的概率比值，最后全部相加，即可判断最终样本的类别。同样，我们使用numpy的矩阵运算。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">train_matrix@r + b &gt; <span class="number">0</span></span><br><span class="line"><span class="comment"># array([False,  True, False,  True, False])</span></span><br><span class="line">valid_matrix@r + b &gt; <span class="number">0</span></span><br><span class="line"><span class="comment"># array([ True])</span></span><br></pre></td></tr></table></figure>
-
-<p>这里<code>@</code>是numpy的矩阵乘操作，举例如图<br><img src="https://i.loli.net/2019/09/18/mS8YliHW3fjbyFQ.png" alt><br>而<code>b</code>作为一个标量，会直接触发numpy中的<code>broadcast</code>操作，直接把<code>+</code>应用到所有样本，同样<code>&gt;</code>也会<code>broadcast</code>，最终得到一个array，表示每一个测试样本是否预测为类别1。</p>
-<hr>
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><p>由于上面推理过程中，<code>train_matrix</code>和<code>valid_matrix</code>都是由词频组成，相当于在求具体概率比值的时候应用词频做了加权。在实际应用中，也可考虑不使用词频，直接使用是否含有某个特征词，如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">train_matrix.sign()@r + b &gt; <span class="number">0</span></span><br><span class="line">valid_matrix.sign()@r + b &gt; <span class="number">0</span></span><br></pre></td></tr></table></figure>
-
-<p>具体哪种方式好，还是要根据实际的数据样本情况来具体测试。</p>
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文以NLP中的句子情感分析为例，使用numpy的矩阵运算来<strong>手撕</strong>朴素贝叶斯算法，可以加深对与朴素贝叶斯算法的理解，并体会机器学习中矩阵运算之道。 </p>
-<p>朴素贝叶斯简单快捷，特别适合较大规模的稀疏矩阵，在情感分析、垃圾邮件分类等场景中有很普遍的应用。在深度学习大行其道的今天，我们仍然可以通过这个简单的算法来快速搭建整个流程的<strong>pipeline</strong>。在我眼里，在机器学习项目的初期，流程pipeline的重要性大于任何算法。</p>
-
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/numpy-naive-bayes/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
@@ -754,7 +542,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/why-start-writting/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/why-start-writting/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -768,7 +556,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2019/09/why-start-writting/" class="post-title-link" itemprop="url">为什么我要开始写作？</a>
+            <a href="/posts/why-start-writting/" class="post-title-link" itemprop="url">为什么我要开始写作？</a>
           
         </h1>
 
@@ -794,7 +582,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 14:18:56" itemprop="dateModified" datetime="2019-09-25T14:18:56+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:24:19" itemprop="dateModified" datetime="2019-09-25T18:24:19+08:00">2019-09-25</time>
               </span>
             
           
@@ -828,68 +616,15 @@
 <p>说起博客，在大学阶段曾经玩过，当时玩的还是<code>MSN Spaces</code>。不过上面更多是一些经历、感悟，为赋新词强说愁罢了。后来读了研究生、有了家庭、有了事业，个人博客也就逐渐荒废了。现在<code>MSN Spaces</code>早已关闭，之前的文章也就无从寻觅了。工作以后，写作方面更多的是工作记录，以零散笔记为主，主要是用的<code>Evernote</code>以及现在的<code>Bear</code>，但是太过零散不成体系。 </p>
 <p>无意之中看到了Andrew Chen的一篇推文，“关于写作的15条推特”，深得我心，也是我为什么想在2019年开始写作的最好诠释。 </p>
 <p>Andrew Chen是在用户增长(User Growth)方面的专家，也曾任<code>Uber</code>的增长VP。以下是他的推文原文，并附上我的思考。</p>
-<hr>
-<h2 id="Andrew-Chen’s-Tweetstorm"><a href="#Andrew-Chen’s-Tweetstorm" class="headerlink" title="Andrew Chen’s Tweetstorm"></a>Andrew Chen’s Tweetstorm</h2><h3 id="Tweet-1"><a href="#Tweet-1" class="headerlink" title="Tweet #1"></a>Tweet #1</h3><blockquote>
-<p>1/ After 10+ years of publishing professional writing at <a href="https://t.co/ddc2F89IIV" target="_blank" rel="noopener">http://andrewchen.co</a> , I have a couple opinions on how to get your stuff read.</p>
-</blockquote>
-<p>在过去十年的工作生涯中，我有着非常多的经历，从<strong>软件工程师</strong>到<strong>Scrum Master</strong>，从<strong>数据分析</strong>到<strong>大数据挖掘</strong>，从<strong>机器学习</strong>到<strong>深度学习</strong>。而这些经历更多的是散落在各处，没有一个地方可以沉淀下来。当我意识到这是个很严重的问题时，我也开启了我自己的个人网站<a href="machinelearningzen.com">machinelearningzen.com</a>的建设，希望能够汇聚我的经历和感悟，并把它们分享出来。</p>
-<h3 id="Tweet-2"><a href="#Tweet-2" class="headerlink" title="Tweet #2"></a>Tweet #2</h3><blockquote>
-<p>2/ Titles are 80% of the work, but you write it as the very last thing. It has to be an compelling opinion or important learning</p>
-</blockquote>
-<p>现在人的生活节奏都非常的快，这也是“<strong>标题党</strong>”横行的客观原因。但是我觉得除了有一个引人入胜的标题外，还是要有能够撑得起这个标题的<strong>干货</strong>内容才行。</p>
-<h3 id="Tweet-3"><a href="#Tweet-3" class="headerlink" title="Tweet #3"></a>Tweet #3</h3><blockquote>
-<p>3/ There’s always room for high-quality thoughts/opinions. Venn diagram of people w/ knowledge and those we can communicate is tiny</p>
-</blockquote>
-<p>这个也应证了“<strong>内容为王</strong>”。现在虽是自媒体时代，但是各种抄袭、伪原创仍然遍地都是。我希望我自己的内容都是自己经过<strong>深度思考</strong>后的输出，而不是东拼西凑。</p>
-<h3 id="Tweet-4"><a href="#Tweet-4" class="headerlink" title="Tweet #4"></a>Tweet #4</h3><blockquote>
-<p>4/ Writing is the most scalable professional networking activity - stay home, don’t go to events/conferences, and just put ideas down</p>
-</blockquote>
-<p>非常赞同，感谢<strong>互联网</strong>和<strong>移动互联网</strong>，我们可以呆在家里或者星巴克，一杯咖啡，就能跟全世界志同道合的朋友交流。</p>
-<h3 id="Tweet-5"><a href="#Tweet-5" class="headerlink" title="Tweet #5"></a>Tweet #5</h3><blockquote>
-<p>5/ Think of your writing on the same timescale as your career. Write on a multi-decade timeframe. This means, don’t just pub on Quora/Medium</p>
-</blockquote>
-<p>写作是一个非常好的把自己的碎片知识<strong>体系化</strong>、<strong>融会贯通</strong>的方式。以十年为单位日积月累，你的知识体系会像参天大树一样。</p>
-<h3 id="Tweet-6"><a href="#Tweet-6" class="headerlink" title="Tweet #6"></a>Tweet #6</h3><blockquote>
-<p>6/ Focus on writing freq over anything else. Schedule it. Don’t worry about building an immediate audience. Focus on the intrinsic.</p>
-</blockquote>
-<p>专注于内容本身，不用担心没有读者。另外，保持写作的<strong>频率</strong>，人都会有“拖延症”，有些事情，一旦开始拖就等于结束了。</p>
-<h3 id="Tweet-7"><a href="#Tweet-7" class="headerlink" title="Tweet #7"></a>Tweet #7</h3><blockquote>
-<p>7/ To develop the habit, put a calendar reminder each Sunday for 2 hours. Forced myself to stare at a blank text box and put something down</p>
-</blockquote>
-<p>养成习惯，必须要有很强的<strong>计划力</strong>和<strong>执行力</strong>。这些能力在工作当中同样重要，需要一辈子的修行。</p>
-<h3 id="Tweet-8"><a href="#Tweet-8" class="headerlink" title="Tweet #8"></a>Tweet #8</h3><blockquote>
-<p>8/ Most of my writing comes from talking/reading deciding I strongly agree or disagree. These opinions become titles. Titles become essays.</p>
-</blockquote>
-<p>保持<strong>阅读</strong>和<strong>交流</strong>非常重要。我的工作生涯的前几年，由于圈子太窄，接触的信息也很少，导致成长非常缓慢。后来注意到这个问题后，开始大量的阅读和交流，自己也开始了突飞猛进。现在，是时候把这些阅读和交流再继续沉淀成文字，给更多的人分享。</p>
-<h3 id="Tweet-9"><a href="#Tweet-9" class="headerlink" title="Tweet #9"></a>Tweet #9</h3><blockquote>
-<p>9/ People are often obsessed with needing to write original ideas. Forget it. You’re a journalist with a day job in the tech industry</p>
-</blockquote>
-<p>不用拘泥于开天辟地，现在的科技领域已经不是个人单打独斗的时代了。学会踩在巨人的肩膀上，你才能看得更远。</p>
-<h3 id="Tweet-10"><a href="#Tweet-10" class="headerlink" title="Tweet #10"></a>Tweet #10</h3><blockquote>
-<p>10/ An email subscriber is worth 100x twitter or LinkedIn followers or whatever other stuff is out there. An email = a real channel</p>
-</blockquote>
-<p><strong>Email 订阅</strong>在国外非常流行，可是在中国一直发展不起来，或许就是人们的使用习惯导致。好在移动互联网时代，<strong>微信公众号</strong>也是一个真正的推送渠道。我也开通了自己的微信公众号，文章和个人网站同步，希望喜欢听我的分享的朋友可以通过这种方式得到最新文章的推送。</p>
-<h3 id="Tweet-11"><a href="#Tweet-11" class="headerlink" title="Tweet #11"></a>Tweet #11</h3><blockquote>
-<p>11/ I started writing while working at a VC. They asked, “Why give away ideas? That’s your edge.” Ironic that VCs blog/tweet all day now ;)</p>
-</blockquote>
-<p>这个也是很多人不愿意写博客分享的原因，害怕自己的idea被别人抄袭。其实写文章分享idea，获得巨大提升的还是自己。</p>
-<h3 id="Tweet-12"><a href="#Tweet-12" class="headerlink" title="Tweet #12"></a>Tweet #12</h3><blockquote>
-<p>12/ Publishing ideas, learnings, opinions, for years &amp; years is a great way to give. And you’ll figure out how to capture value later</p>
-</blockquote>
-<p>年复一年地发表你的想法、学到的知识、观点，你很快就能在分享之后获得其中的价值。虽然我才开始真正的写作，我已经感受到了自己的成长，我会一直把它持续下去。</p>
-<h3 id="Tweet-13"><a href="#Tweet-13" class="headerlink" title="Tweet #13"></a>Tweet #13</h3><blockquote>
-<p>13/ Today I learned that tweetstorms can be way less structured than writing an essay, which makes it much easier ;) This is my first one!</p>
-</blockquote>
-<p>Andrew Chen认为在twitter上写作是另外一种轻松愉快的方式，他把这种方式命名为“<strong>推特风暴</strong>”</p>
-<h3 id="Tweet-14"><a href="#Tweet-14" class="headerlink" title="Tweet #14"></a>Tweet #14</h3><blockquote>
-<p>14/ OK that’s all for now! Thanks for reading :)</p>
-</blockquote>
-<p>:)</p>
-<h3 id="Tweet-15"><a href="#Tweet-15" class="headerlink" title="Tweet #15"></a>Tweet #15</h3><blockquote>
-<p>15/ Bonus: In order of value, Writing &gt; Reading books &gt; Reading reddit &gt; Twitter &gt; FB/Instagram ;)</p>
-</blockquote>
-<p>这个是Andrew认为的价值排序：写作 &gt; 读书 &gt; 读 reddit &gt; Twitter &gt; Facebook/Instagram。当然这是站在个人提升的价值上的，切记，我们的<strong>工作</strong>不等于我们的<strong>生活</strong>。保持自己1～2个爱好，并持续投入成为达人，你的人生会更加美好。</p>
-
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/why-start-writting/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
@@ -913,7 +648,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/numpy-lsa/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/numpy-lsa/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -927,7 +662,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2019/09/numpy-lsa/" class="post-title-link" itemprop="url">numpy“手撕”文本主题模型之LSA</a>
+            <a href="/posts/numpy-lsa/" class="post-title-link" itemprop="url">numpy“手撕”文本主题模型之LSA</a>
           
         </h1>
 
@@ -953,7 +688,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 14:39:59" itemprop="dateModified" datetime="2019-09-25T14:39:59+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:24:35" itemprop="dateModified" datetime="2019-09-25T18:24:35+08:00">2019-09-25</time>
               </span>
             
           
@@ -986,52 +721,15 @@
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在前文中，我们采用了一个tf-idf来获取本文的关键词（主题）。由于tf-idf算法仅仅是一个统计模型，简单快速，适合作为baseline。它最大的问题在于单单考虑了词频，而没有考虑语义，并且我们取topK的词，这个K值如何选取，也是一个问题。 </p>
 <p>本文介绍一种真正的主题模型，也是最早出现的主题模型LSA（Latent Semantic Analysis）：潜在语义分析，它主要是利用SVD降维的方式，将词与本文映射到一个新的空间，而这个空间正是以主题作为维度。它的原理非常漂亮，一次奇异值分解就可以得到主题模型，同时也解决了词义的问题。 </p>
 <p>本文继续发挥hands-on的传统，以一个实例来说明LSA的用法。在生产环境中，一般会使用gensim等框架来快速进行开发，本文从scipy和numpy入手，可以更清楚的了解其中的原理。</p>
-<hr>
-<h2 id="数据预处理"><a href="#数据预处理" class="headerlink" title="数据预处理"></a>数据预处理</h2><p>为了演示方便，我们直接采用了scikit-learn中的Newsgroups数据集。这是用于文本分类、文本挖据和信息检索研究的国际标准数据集之一。数据集收集了大约20,000左右的新闻组文档，均匀分为20个不同主题的新闻组集合。 </p>
-<p>我们截取了其中4个主题的数据，并采用scikit-learn中的API来装载。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> fetch_20newsgroups</span><br><span class="line">categories = [<span class="string">'alt.atheism'</span>, <span class="string">'talk.religion.misc'</span>,<span class="string">'comp.graphics'</span>, <span class="string">'sci.space'</span>]</span><br><span class="line">remove = (<span class="string">'headers'</span>, <span class="string">'footers'</span>, <span class="string">'quotes'</span>)</span><br><span class="line">newsgroups_train = fetch_20newsgroups(subset=<span class="string">'train'</span>,categories=categories, remove=remove)</span><br><span class="line">newsgroups_test = fetch_20newsgroups(subset=<span class="string">'test'</span>,categories=categories, remove=remove)</span><br></pre></td></tr></table></figure>
-
-<p>数据下载好后，我们看看里面的文本长啥样</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">newsgroups_train.data[:<span class="number">5</span>]</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">["Hi,\n\n</span></span><br><span class="line"><span class="string">  I've noticed that if you only save a model (withall your mapping planes\n</span></span><br><span class="line"><span class="string">  positioned carefully) to a .3DSfile that when you reload it after restarting\n</span></span><br><span class="line"><span class="string">  3DS, theyare given a default position and orientation.  But if yousave\nto a .PRJ file their positions/orientation arepreserved.  Does anyone\n</span></span><br><span class="line"><span class="string">  know why this information is notstored in the .3DS file?  Nothing is\nexplicitly said inthe manual about saving texture rules in the .PRJ file.\n</span></span><br><span class="line"><span class="string">  I'd like to be able to read the texture rule information,does anyone have \n</span></span><br><span class="line"><span class="string">  the format for the .PRJ file?\n\n</span></span><br><span class="line"><span class="string">  Is the.CEL file format available from somewhere?\n\n</span></span><br><span class="line"><span class="string">  Rych",</span></span><br><span class="line"><span class="string"> '\n\n</span></span><br><span class="line"><span class="string"> Seems to be, barring evidence to the contrary, that Koresh was simply\n</span></span><br><span class="line"><span class="string"> another deranged fanatic who thought it neccessary to take a whole bunch of\n</span></span><br><span class="line"><span class="string"> folks with him, children and all, to satisfy his delusional mania. Jim\n</span></span><br><span class="line"><span class="string"> Jones, circa 1993.\n\n\n</span></span><br><span class="line"><span class="string"> Nope - fruitcakes like Koresh have been demonstrating such evil corruption\n</span></span><br><span class="line"><span class="string"> for centuries.']</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>拿到文本后，第一件事当然是tokenizer，然后采用bag-of-words词袋模型将其向量化。这里使用scikit-learn中的<code>CountVectorizer</code>，以词频计数来作为向量值，当然更精细化可以采用<code>TfidfVectorizer</code>。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> CountVectorizer</span><br><span class="line">vectorizer = CountVectorizer(stop_words=<span class="string">'english'</span>)</span><br><span class="line">vectors = vectorizer.fit_transform(newsgroups_train.data.todense()</span><br><span class="line">vocab = np.array(vectorizer.get_feature_names())</span><br></pre></td></tr></table></figure>
-
-<p>可以看看向量化后的矩阵</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vectors.shape</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">(2034, 26576)</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>这里表示共有2034篇文档，词的vocab_size为26576，将所有文档转成了26576维的向量，每个向量的值为该维表示词的词频。</p>
-<hr>
-<h2 id="SVD分解"><a href="#SVD分解" class="headerlink" title="SVD分解"></a>SVD分解</h2><p>向量化完成后，我们就可以开始奇异值分解了。 <img src="https://i.loli.net/2019/09/12/sQtcY7TbDElKN3n.png" alt></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scipy</span><br><span class="line">U, s, Vh = scipy.linalg.svd(vectors, full_matrices=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
-
-<p>根据上图，我们可以看到分解出来的矩阵： </p>
-<ul>
-<li>U: (2034, 2034) 表示2034个样本，对应2034个topic </li>
-<li>s: (2034, ) 表示2034个奇异值，即topic的重要性分数 </li>
-<li>Vh: (2034, 26576) 表示2034个topic，对应26576个vocab，注意这个Vh是公式中的VT，即转置后的V </li>
-</ul>
-<p>SVD奇异值分解，具有以下性质： </p>
-<ul>
-<li>奇异值分解为精确分解，即分解后的矩阵可以完全还原原矩阵，信息不丢失 </li>
-<li>U和Vh是正交矩阵 我们可以在numpy中验证一下：</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注意将s从一维向量转换成对角矩阵(diagonal matrix)</span></span><br><span class="line">np.allclose(U.dot(np.diag(s)).dot(Vh), vectors)</span><br><span class="line">np.allclose(U.T.dot(U), np.eye(U.shape[<span class="number">0</span>]))</span><br><span class="line">np.allclose(Vh.dot(Vh.T), np.eye(Vh.shape[<span class="number">0</span>]))</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="Topic解读"><a href="#Topic解读" class="headerlink" title="Topic解读"></a>Topic解读</h2><p>LSA的优雅之处，就是把之前的高维文档向量，降维到低维，且这个维度代表了文档的隐含语义，即这个文档的主题topic。svd分解出来的Vh矩阵，即是每个主题的矩阵，维度是每个单词，维度值可以看成是这个主题中每个单词的的重要性。那么，我们可以选取重要性最高的词，来解读某个隐含主题。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">num_top_words = <span class="number">8</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_topics</span><span class="params">(a)</span>:</span></span><br><span class="line">    top_words = <span class="keyword">lambda</span> t: [vocab[i] <span class="keyword">for</span> i <span class="keyword">in</span> np.argsort(t)[:-num_top_words<span class="number">-1</span>:<span class="number">-1</span>]]</span><br><span class="line">    topic_words = ([top_words(t) <span class="keyword">for</span> t <span class="keyword">in</span> a])</span><br><span class="line"><span class="keyword">return</span> [<span class="string">' '</span>.join(t) <span class="keyword">for</span> t <span class="keyword">in</span> topic_words]</span><br><span class="line">show_topics(Vh[:<span class="number">10</span>])</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">['ditto critus propagandist surname galacticentrickindergarten surreal imaginative',</span></span><br><span class="line"><span class="string"> 'jpeg gif file color quality image jfif format',</span></span><br><span class="line"><span class="string"> 'graphics edu pub mail 128 3d ray ftp',</span></span><br><span class="line"><span class="string"> 'jesus god matthew people atheists atheism does graphics',</span></span><br><span class="line"><span class="string"> 'image data processing analysis software available tools display',</span></span><br><span class="line"><span class="string"> 'god atheists atheism religious believe religion argument true',</span></span><br><span class="line"><span class="string"> 'space nasa lunar mars probe moon missions probes',</span></span><br><span class="line"><span class="string"> 'image probe surface lunar mars probes moon orbit',</span></span><br><span class="line"><span class="string"> 'argument fallacy conclusion example true ad argumentum premises',</span></span><br><span class="line"><span class="string"> 'space larson image theory universe physical nasa material']</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
-
-<p>可以看出，有些主题是关于图片格式的，有的是关于邮件协议的，有的是关于太空的。 而svd分解出来的U矩阵，就是每个文档对应的主题矩阵，维度是每个主题，维度值也可以看成是每个主题的重要性。</p>
-<hr>
-<h2 id="Truncated-SVD"><a href="#Truncated-SVD" class="headerlink" title="Truncated SVD"></a>Truncated SVD</h2><p>在生产实践中，普通svd由于要exact decomposition，计算量会非常大，且最后的应用往往会只看前n个topic，因此Truncated SVD的优势在于，预先设置好n的值，可以在牺牲一定精度的条件下，大大减少计算量。这里提供两种常见的svd实现以作参考。 </p>
-<h3 id="sklearn实现"><a href="#sklearn实现" class="headerlink" title="sklearn实现"></a>sklearn实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> decomposition</span><br><span class="line">u, s, v = decomposition.randomized_svd(vectors, <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="Facebook实现"><a href="#Facebook实现" class="headerlink" title="Facebook实现"></a>Facebook实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> fbpca</span><br><span class="line">u, s, v = fbpca.pca(vectors, <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>LSA作为最早出现的真正主题模型，非常优雅，同时也存在很多不足，比如它得到的不是一个概率模型，同时得到的向量中含有负值，难以直观解释。针对这些问题，后续就有NMF（非负矩阵分解），LDA（隐含狄利克雷分布）等模型出现。</p>
-
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/numpy-lsa/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
@@ -1055,7 +753,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/neo4j-tutorial/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/knowledge-graph-neo4j-toturial/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -1069,7 +767,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2019/09/neo4j-tutorial/" class="post-title-link" itemprop="url">手把手教你快速入门知识图谱 - Neo4J教程</a>
+            <a href="/posts/knowledge-graph-neo4j-toturial/" class="post-title-link" itemprop="url">手把手教你快速入门知识图谱 - Neo4J教程</a>
           
         </h1>
 
@@ -1095,7 +793,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 14:37:00" itemprop="dateModified" datetime="2019-09-25T14:37:00+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:24:54" itemprop="dateModified" datetime="2019-09-25T18:24:54+08:00">2019-09-25</time>
               </span>
             
           
@@ -1131,108 +829,15 @@
 </blockquote>
 <p>简单说来，知识图谱就是通过不同知识的关联性形成一个网状的知识结构，而这个知识结构，恰好就是人工智能AI的基石。当前AI领域热门的计算机图像、语音识别甚至是NLP，其实都是AI的<code>感知</code>能力，真正AI的<code>认知</code>能力，就要靠知识图谱。 </p>
 <p>知识图谱目前的应用主要在搜索、智能问答、推荐系统等方面。知识图谱的建设，一般包括数据获取、实体识别和关系抽取、数据存储、图谱应用都几个方面。本文着眼于数据存储这块，给大家一个Neo4J的快速教程。</p>
-<hr>
-<h2 id="Neo4J简介"><a href="#Neo4J简介" class="headerlink" title="Neo4J简介"></a>Neo4J简介</h2><p>知识图谱由于其数据包含实体、属性、关系等，常见的关系型数据库诸如MySQL之类不能很好的体现数据的这些特点，因此知识图谱数据的存储一般是采用图数据库（Graph Databases）。而<a href="https://neo4j.com/" target="_blank" rel="noopener">Neo4j</a>是其中最为常见的图数据库。</p>
-<hr>
-<h2 id="Neo4J安装"><a href="#Neo4J安装" class="headerlink" title="Neo4J安装"></a>Neo4J安装</h2><p>首先在 <a href="https://neo4j.com/download/" target="_blank" rel="noopener">https://neo4j.com/download/</a> 下载Neo4J。Neo4J分为社区版和企业版，企业版在横向扩展、权限控制、运行性能、HA等方面都比社区版好，适合正式的生产环境，普通的学习和开发采用免费社区版就好。 </p>
-<p>在Mac或者Linux中，安装好jdk后，直接解压下载好的Neo4J包，运行<code>bin/neo4j start</code>即可</p>
-<hr>
-<h2 id="Neo4J使用"><a href="#Neo4J使用" class="headerlink" title="Neo4J使用"></a>Neo4J使用</h2><p>Neo4J提供了一个用户友好的web界面，可以进行各项配置、写入、查询等操作，并且提供了可视化功能。类似ElasticSearch一样，我个人非常喜欢这种开箱即用的设计。 </p>
-<p>打开浏览器，输入<code>http://127.0.0.1:7474/browser/</code>，如下图所示，界面最上方就是交互的输入框。 <img src="https://i.loli.net/2019/09/11/lwfscI2XFUDGd3y.png" alt></p>
-<hr>
-<h2 id="Cypher查询语言"><a href="#Cypher查询语言" class="headerlink" title="Cypher查询语言"></a>Cypher查询语言</h2><p>Cypher是Neo4J的声明式图形查询语言，允许用户不必编写图形结构的遍历代码，就可以对图形数据进行高效的查询。Cypher的设计目的类似SQL，适合于开发者以及在数据库上做点对点模式（ad-hoc）查询的专业操作人员。其具备的能力包括： </p>
-<ul>
-<li>创建、更新、删除节点和关系 </li>
-<li>通过模式匹配来查询和修改节点和关系 </li>
-<li>管理索引和约束等</li>
-</ul>
-<hr>
-<h2 id="Neo4J实战教程"><a href="#Neo4J实战教程" class="headerlink" title="Neo4J实战教程"></a>Neo4J实战教程</h2><p>直接讲解Cypher的语法会非常枯燥，本文通过一个实际的案例来一步一步教你使用Cypher来操作Neo4J。 </p>
-<p>这个案例的节点主要包括人物和城市两类，人物和人物之间有朋友、夫妻等关系，人物和城市之间有出生地的关系。 </p>
-<p>1. 首先，我们删除数据库中以往的图，确保一个空白的环境进行操作：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (n) DETACH DELETE n</span><br></pre></td></tr></table></figure>
-
-<p>这里，<code>MATCH</code>是<strong>匹配</strong>操作，而小括号()代表一个<strong>节点</strong>node（可理解为括号类似一个圆形），括号里面的n为<strong>标识符</strong>。</p>
-<p>2. 接着，我们创建一个人物节点：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE (n:Person &#123;name:&apos;John&apos;&#125;) RETURN n</span><br></pre></td></tr></table></figure>
-
-<p><code>CREATE</code>是<strong>创建</strong>操作，<code>Person</code>是<strong>标签</strong>，代表节点的类型。花括号{}代表节点的<strong>属性</strong>，属性类似Python的字典。这条语句的含义就是创建一个标签为Person的节点，该节点具有一个name属性，属性值是John。 </p>
-<p>如图所示，在Neo4J的界面上可以看到创建成功的节点。<br><img src="https://i.loli.net/2019/09/11/CLP43jfdTyENraJ.png" alt><br>3. 我们继续来创建更多的人物节点，并分别命名：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CREATE (n:Person &#123;name:&apos;Sally&apos;&#125;) RETURN n</span><br><span class="line">CREATE (n:Person &#123;name:&apos;Steve&apos;&#125;) RETURN n</span><br><span class="line">CREATE (n:Person &#123;name:&apos;Mike&apos;&#125;) RETURN n</span><br><span class="line">CREATE (n:Person &#123;name:&apos;Liz&apos;&#125;) RETURN n</span><br><span class="line">CREATE (n:Person &#123;name:&apos;Shawn&apos;&#125;) RETURN n</span><br></pre></td></tr></table></figure>
-
-<p>如图所示，6个人物节点创建成功<br><img src="https://i.loli.net/2019/09/11/oxL5jIctOwEiQJa.png" alt><br>4. 接下来创建地区节点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CREATE (n:Location &#123;city:&apos;Miami&apos;, state:&apos;FL&apos;&#125;)</span><br><span class="line">CREATE (n:Location &#123;city:&apos;Boston&apos;, state:&apos;MA&apos;&#125;)</span><br><span class="line">CREATE (n:Location &#123;city:&apos;Lynn&apos;, state:&apos;MA&apos;&#125;)</span><br><span class="line">CREATE (n:Location &#123;city:&apos;Portland&apos;, state:&apos;ME&apos;&#125;)</span><br><span class="line">CREATE (n:Location &#123;city:&apos;San Francisco&apos;, state:&apos;CA&apos;&#125;)</span><br></pre></td></tr></table></figure>
-
-<p>可以看到，节点类型为Location，属性包括city和state。 </p>
-<p>如图所示，共有6个人物节点、5个地区节点，Neo4J贴心地使用不用的颜色来表示不同类型的节点。<br><img src="https://i.loli.net/2019/09/11/ctOzboFgvdV43h2.png" alt> </p>
-<p>5. 接下来创建关系</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person &#123;name:&apos;Liz&apos;&#125;), </span><br><span class="line">      (b:Person &#123;name:&apos;Mike&apos;&#125;) </span><br><span class="line">MERGE (a)-[:FRIENDS]-&gt;(b)</span><br></pre></td></tr></table></figure>
-
-<p>这里的方括号<code>[]</code>即为关系，<code>FRIENDS</code>为关系的类型。注意这里的箭头<code>--&gt;</code>是有方向的，表示是从a到b的关系。 如图，Liz和Mike之间建立了<code>FRIENDS</code>关系，通过Neo4J的可视化很明显的可以看出：<br><img src="https://i.loli.net/2019/09/11/WuYc7FB9xGXCdNz.png" alt> </p>
-<p>6. 关系也可以增加属性</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person &#123;name:&apos;Shawn&apos;&#125;), </span><br><span class="line">      (b:Person &#123;name:&apos;Sally&apos;&#125;) </span><br><span class="line">MERGE (a)-[:FRIENDS &#123;since:2001&#125;]-&gt;(b)</span><br></pre></td></tr></table></figure>
-
-<p>在关系中，同样的使用花括号{}来增加关系的属性，也是类似Python的字典，这里给FRIENDS关系增加了since属性，属性值为2001，表示他们建立朋友关系的时间。 </p>
-<p>7. 接下来增加更多的关系</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person &#123;name:&apos;Shawn&apos;&#125;), (b:Person &#123;name:&apos;John&apos;&#125;) MERGE (a)-[:FRIENDS &#123;since:2012&#125;]-&gt;(b)</span><br><span class="line">MATCH (a:Person &#123;name:&apos;Mike&apos;&#125;), (b:Person &#123;name:&apos;Shawn&apos;&#125;) MERGE (a)-[:FRIENDS &#123;since:2006&#125;]-&gt;(b)</span><br><span class="line">MATCH (a:Person &#123;name:&apos;Sally&apos;&#125;), (b:Person &#123;name:&apos;Steve&apos;&#125;) MERGE (a)-[:FRIENDS &#123;since:2006&#125;]-&gt;(b)</span><br><span class="line">MATCH (a:Person &#123;name:&apos;Liz&apos;&#125;), (b:Person &#123;name:&apos;John&apos;&#125;) MERGE (a)-[:MARRIED &#123;since:1998&#125;]-&gt;(b)</span><br></pre></td></tr></table></figure>
-
-<p>如图，人物关系图已建立好，有点图谱的意思了吧？<br><img src="https://i.loli.net/2019/09/11/e3qk5JYAltIMP6w.png" alt> </p>
-<p>8. 然后，我们需要建立不同类型节点之间的关系-人物和地点的关系</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person &#123;name:&apos;John&apos;&#125;), (b:Location &#123;city:&apos;Boston&apos;&#125;) MERGE (a)-[:BORN_IN &#123;year:1978&#125;]-&gt;(b)</span><br></pre></td></tr></table></figure>
-
-<p>这里的关系是BORN_IN，表示出生地，同样有一个属性，表示出生年份。 </p>
-<p>如图，在人物节点和地区节点之间，人物出生地关系已建立好。<br><img src="https://i.loli.net/2019/09/11/mcqo2gadJSFDPks.png" alt> </p>
-<p>9. 同样建立更多人的出生地</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person &#123;name:&apos;Liz&apos;&#125;), (b:Location &#123;city:&apos;Boston&apos;&#125;) MERGE (a)-[:BORN_IN &#123;year:1981&#125;]-&gt;(b)</span><br><span class="line">MATCH (a:Person &#123;name:&apos;Mike&apos;&#125;), (b:Location &#123;city:&apos;San Francisco&apos;&#125;) MERGE (a)-[:BORN_IN &#123;year:1960&#125;]-&gt;(b)</span><br><span class="line">MATCH (a:Person &#123;name:&apos;Shawn&apos;&#125;), (b:Location &#123;city:&apos;Miami&apos;&#125;) MERGE (a)-[:BORN_IN &#123;year:1960&#125;]-&gt;(b)</span><br><span class="line">MATCH (a:Person &#123;name:&apos;Steve&apos;&#125;), (b:Location &#123;city:&apos;Lynn&apos;&#125;) MERGE (a)-[:BORN_IN &#123;year:1970&#125;]-&gt;(b)</span><br></pre></td></tr></table></figure>
-
-<p>建好以后，整个图如下<br><img src="https://i.loli.net/2019/09/11/8d1mHehURqEluz2.png" alt> </p>
-<p>10. 至此，知识图谱的数据已经插入完毕，可以开始做查询了。我们查询下所有在Boston出生的人物</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person)-[:BORN_IN]-&gt;(b:Location &#123;city:&apos;Boston&apos;&#125;) RETURN a,b</span><br></pre></td></tr></table></figure>
-
-<p>结果如图<br><img src="https://i.loli.net/2019/09/11/qY3ZuXoa8wHcFBm.png" alt> </p>
-<p>11. 查询所有对外有关系的节点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a)--&gt;() RETURN a</span><br></pre></td></tr></table></figure>
-
-<p>注意这里箭头的方向，返回结果不含任何地区节点，因为地区并没有指向其他节点（只是被指向）<br><img src="https://i.loli.net/2019/09/11/NRwIq9jsyEbmaHh.png" alt> </p>
-<p>12. 查询所有有关系的节点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a)--() RETURN a</span><br></pre></td></tr></table></figure>
-
-<p>结果如图<br><img src="https://i.loli.net/2019/09/11/QeySct9bkhmLOzJ.png" alt> </p>
-<p>13. 查询所有对外有关系的节点，以及关系类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a)-[r]-&gt;() RETURN a.name, type(r)</span><br></pre></td></tr></table></figure>
-
-<p>结果如图<br><img src="https://i.loli.net/2019/09/11/sKX8TfDLhGckSyO.png" alt> </p>
-<p>14. 查询所有有结婚关系的节点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (n)-[:MARRIED]-() RETURN n</span><br></pre></td></tr></table></figure>
-
-<p>结果如图<br><img src="https://i.loli.net/2019/09/11/hVdUDIzPqT1kHLj.png" alt> </p>
-<p>15. 创建节点的时候就建好关系</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE (a:Person &#123;name:&apos;Todd&apos;&#125;)-[r:FRIENDS]-&gt;(b:Person &#123;name:&apos;Carlos&apos;&#125;)</span><br></pre></td></tr></table></figure>
-
-<p>结果如图<br><img src="https://i.loli.net/2019/09/11/My6HpacvNexVBw1.png" alt> </p>
-<p>16. 查找某人的朋友的朋友</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person &#123;name:&apos;Mike&apos;&#125;)-[r1:FRIENDS]-()-[r2:FRIENDS]-(friend_of_a_friend) RETURN friend_of_a_friend.name AS fofName</span><br></pre></td></tr></table></figure>
-
-<p>返回Mike的朋友的朋友：<br><img src="https://i.loli.net/2019/09/11/sw9Eq8HOGf54TF7.png" alt><br>从图上也可以看出，Mike的朋友是Shawn，Shawn的朋友是John和Sally<br><img src="https://i.loli.net/2019/09/11/N84TZipU3mQg2CH.png" alt> </p>
-<p>17. 增加/修改节点的属性</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person &#123;name:&apos;Liz&apos;&#125;) SET a.age=34</span><br><span class="line">MATCH (a:Person &#123;name:&apos;Shawn&apos;&#125;) SET a.age=32</span><br><span class="line">MATCH (a:Person &#123;name:&apos;John&apos;&#125;) SET a.age=44</span><br><span class="line">MATCH (a:Person &#123;name:&apos;Mike&apos;&#125;) SET a.age=25</span><br></pre></td></tr></table></figure>
-
-<p>这里，SET表示<code>修改</code>操作 </p>
-<p>18. 删除节点的属性</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person &#123;name:&apos;Mike&apos;&#125;) SET a.test=&apos;test&apos;</span><br><span class="line">MATCH (a:Person &#123;name:&apos;Mike&apos;&#125;) REMOVE a.test</span><br></pre></td></tr></table></figure>
-
-<p>删除属性操作主要通过<code>REMOVE</code> </p>
-<p>19. 删除节点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Location &#123;city:&apos;Portland&apos;&#125;) DELETE a</span><br></pre></td></tr></table></figure>
-
-<p>删除节点操作是<code>DELETE</code></p>
-<p>20. 删除有关系的节点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:Person &#123;name:&apos;Todd&apos;&#125;)-[rel]-(b:Person) DELETE a,b,rel</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文重点针对常见的知识图谱图数据库Neo4J进行了介绍，并且采用一个实际的案例来说明Neo4J的查询语言Cypher的使用方法。 </p>
-<p>当然，类似MySQL一样，在实际的生产应用中，除了简单的查询操作会在Neo4J的web页面进行外，一般还是使用Python、Java等的driver来在程序中实现。后续会继续介绍编程语言如何操作Neo4J。</p>
-
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/knowledge-graph-neo4j-toturial/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
@@ -1256,7 +861,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/word2vec/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/nlp-word2vec/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -1270,7 +875,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2019/09/word2vec/" class="post-title-link" itemprop="url">现代NLP的基石 - Word2Vec</a>
+            <a href="/posts/nlp-word2vec/" class="post-title-link" itemprop="url">现代NLP的基石 - Word2Vec</a>
           
         </h1>
 
@@ -1296,7 +901,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 15:27:05" itemprop="dateModified" datetime="2019-09-25T15:27:05+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:25:14" itemprop="dateModified" datetime="2019-09-25T18:25:14+08:00">2019-09-25</time>
               </span>
             
           
@@ -1328,56 +933,15 @@
           <p><img src="https://i.loli.net/2019/09/10/cXgEFD47ewZpmoJ.png" alt="Zv8mc6ulBIVCneD.png"></p>
 <h2 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h2><p>机器学习的各项算法，都可以简单理解为：一个向量vector，经过一个函数f(x)，结果得到另一个向量vector或者标量scalar。输入的这个向量，我们称之为样本sample，向量中的每一个值，代表了样本的每一维特征feature。这个向量一般是浮点数的，即<code>dtype=np.float32</code>。 </p>
 <p>在NLP的相关领域中，我们的样本往往是一段文本内容，如一个句子、一篇文章等等，我们不能把这些文本直接喂给机器学习模型，而是要先把文本转换成浮点数的向量，即文本的向量化表示。这在NLP领域中是非常基础且重要的阶段，其结果可以用在文档搜索，网页搜索，垃圾邮件过滤，文本主题建模等等方面。</p>
-<hr>
-<h2 id="BOW"><a href="#BOW" class="headerlink" title="BOW"></a>BOW</h2><p>在文本的向量话表示领域中，最早出现的方法是BOW（Bag Of Words），即词袋模型。这个模型利用onehot编码的思想，把每一个词看作是一个维度，然后一个文档或句子就可以表示成一个维度为N的向量，N为语料中词语的个数。每个维度具体的值，可以通过简单计数或者计算TF-IDF值来得出。实际方案可参考<code>Scikit Learn</code>的<code>CountVectorizer</code>和<code>TfidfVectorizer</code>。</p>
-<div align="center">
-    <img width="300" height="300" src="https://i.loli.net/2019/09/10/qfMGJs7cwhdBnU4.png">
-</div>
-
-<p>这种方式简单，但是效果一般，因为它忽略了很多信息，比如在一个句子中词语的顺序。另外，由于每个词语都是独立的维度，词与词之间的距离（相关）都是相等的，这也明显不合理。</p>
-<hr>
-<h2 id="Word2Vec"><a href="#Word2Vec" class="headerlink" title="Word2Vec"></a>Word2Vec</h2><p>Word2vec <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">1301.3781 Efficient Estimation of Word Representations in Vector Space</a>是这个领域非常重要的理念。我认为，Word2Vec是NLP迈向深度学习的基石，通过embedding的方法，让模型能够理解到每个词背后的隐藏含义。 </p>
-<p>Word2Vec认为，每一个词都可以表示为一个密集多维向量（相比BOW中的稀疏向量），且这个向量可以捕捉词与词之间的关联。显然，密集的浮点向量，对于机器学习模型是非常友好的。</p>
-<div align="center">
-    <img width="300" height="140" src="https://i.loli.net/2019/09/10/N6Htnv8AJhdp4Og.png">
-</div>
-
-<p>Word2Vec除了采用密集浮点向量来表示每一个单词外，还能实现一个特殊的功能，把数学运算和文本结合起来，比如著名的“king-man-queen-woman”图如下所示：</p>
-<div align="center">
-    <img width="300" height="300" src="https://i.loli.net/2019/09/10/5ZANefGBoP9npxh.png">
-</div>
-
-<p>采用Word2Vec表示以后，我们可以通过矩阵运算，得出 king-man = queen-woman的等式，即词语的向量中，包含了king和queen中关于王权的概念，同时也包含了man和woman的男女之别。 </p>
-<p>Word2Vec按照实现算法，可分为两类：</p>
-<h3 id="CBOW"><a href="#CBOW" class="headerlink" title="CBOW"></a>CBOW</h3><p>CBOW(Continuous Bag Of Words)是实现word2vec的算法之一。它在每个词语上构造了一个滑动窗口，即词语的上下文-词周围的那些词。每个词都用一个固定长度的向量来表示，然后就可以根据词周围的词来预测中间那个词。 </p>
-<p>在训练过程中，根据每次的预测情况，使用GradientDesent方法，不断调整周围词的向量，当训练完成以后，每个词都会作为中心词，把周围的词向量进行了调整，而这种调整是统一的，即求出的gradient值会同样作用到每个周围词的词向量中。 </p>
-<p>值得注意的是，在实际操作过程中，周围词的向量会首先通过sum或者concat的方式组合在一起，然后进行预测，在训练过程中，每个epoch计算的次数跟整个文本的词数几乎相等，复杂度大概为O(V)。</p>
-<div align="center">
-    <img width="300" height="190" src="https://i.loli.net/2019/09/10/4x51QCPY9eBKwbc.png">
-    <img width="400" height="290" src="https://i.loli.net/2019/09/10/yjgV8NnSTFsY5eO.png">
-</div>
-
-<p>更通俗一点的理解，相当于1个老师对应了K个学生，K个学生（周围词）都会从老师（中心词）那里学习知识，但是老师（中心词）是一视同仁的，教给大家一样的知识。因此，这种方式对于具体某个学生，学习的结果不一定是最好的，但是整个班级的训练过程是效率最高最快的。</p>
-<h3 id="Skip-gram"><a href="#Skip-gram" class="headerlink" title="Skip-gram"></a>Skip-gram</h3><p>Skip-gram是word2vec的另一种实现算法。它跟cbow完全相反，即使用一个词来预测它周围的词。在skip-gram中，会利用对周围词的预测情况，使用GradientDecent来不断的调整中心词的词向量，最终所有文本遍历完以后，也就得到了文本所有词的词向量。 </p>
-<p>可以看出，skip-gram的训练次数是要多于cbow的，因为每个词在作为中心词时，都需要把它周围的词全部预测一次，这样相当于比cbow的方法多进行了K-1次（假设K为窗口大小），因此复杂度为O(KV)。</p>
-<div align="center">
-    <img width="500" height="280" src="https://i.loli.net/2019/09/10/PmEfvMoHG8NZQJw.png">
-</div>
-
-<p>如图所示，这里的窗口值为2，蓝色的词是输入，窗口内的其他词为输出，这样将一个句子转化为训练样本。 </p>
-<p>在skip-gram当中，每个词都要受到周围词的影响，每个词在作为中心词的时候，都要进行K次的预测、调整，因此，当数据量较少的时候，或者词为生僻词出现次数较少时，这种多次的调整会使得词向量更加的准确。 </p>
-<p>对比上面的老师与学生的比喻，在skip-gram中，每个词作为中心词时，其实是1个学生 对应了K个老师，K个老师（周围词）都会对学生（中心词）进行训练，这样单个学生的能力就会相对扎实一些，但是这种训练方式整个班级的学习时间肯定更长。</p>
-<h3 id="Negative-Sample"><a href="#Negative-Sample" class="headerlink" title="Negative Sample"></a>Negative Sample</h3><p>按照正常的训练逻辑，cbow和skip-gram都是分类模型，分类类别数等于语料中词语的个数。因此模型在最后的softmax层非常巨大，会导致训练的时间非常长，且需要非常大的训练数据来收敛模型和避免over-fitting。 </p>
-<p>举个例子，若有一个包含10000个单词的词汇表，而向量特征为300维，则在最后一层Dense层会有300x10000个权重需要更新。 </p>
-<p>为了解决这个问题，word2vec的作者提出了2个方案： </p>
-<ul>
-<li>Subsampling frequent words：以一定的阈值过滤掉了一些高频词，比如“the”，这样可以在一定程度上减少训练数据的数量。 </li>
-<li>Negative sampling：改变优化目标函数，使得每一个训练样本只更新网络的小部分权重。 </li>
-</ul>
-<p>举个例子，在训练样本(”fox”, “quick”)时，我们的输出（标签）为一个one-hot向量，且代表”quick”的神经元输出为1，代表其他成千上万的词的神经元输出为0。采用了negative sampling后，我们首先随机选取一小部分”negative”词语（比如5个）去更新网络的权重，而”positive”词语依然也会更新网络权重。如果在网络的输出层，以前是300x10000的矩阵，现在只需要更新1+5=6个单词，即300x6个权重，是以前的0.06%。在Tensorflow中，有现成的辅助函数<code>tf.nn.nce_loss()</code>可供使用。而在具体的negative samples的选取上，使用了“unigram distribution”，即更频繁使用的词语更容易被选取。</p>
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文介绍了Word2Vec的起源及相应实现的2种算法cbow和skip-gram，详细对比了这两种算法的原理、训练方式及优缺点，还介绍了Word2Vec训练时的重要trick: negative sampling。Word2Vec虽然不算深度学习，但是它带来的embedding的概念却是现代NLP乃至深度学习的基石，后续我们会继续介绍由此发展的Doc2Vec、Item2Vec、Anything2Vec。</p>
-
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/nlp-word2vec/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
@@ -1401,7 +965,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/07/web-topic-extractor/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/web-topic-extractor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -1415,7 +979,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2019/07/web-topic-extractor/" class="post-title-link" itemprop="url">任意网页正文内容主题词提取</a>
+            <a href="/posts/web-topic-extractor/" class="post-title-link" itemprop="url">任意网页正文内容主题词提取</a>
           
         </h1>
 
@@ -1441,7 +1005,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 15:19:44" itemprop="dateModified" datetime="2019-09-25T15:19:44+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:20:43" itemprop="dateModified" datetime="2019-09-25T18:20:43+08:00">2019-09-25</time>
               </span>
             
           
@@ -1478,49 +1042,15 @@
 <li><strong>正文提取</strong>。现在的web页面是非常复杂的，除了正文外，包含了大量的广告、导航、信息流等，我们需要去除干扰，只提取网页的正文信息。 </li>
 <li><strong>主题模型</strong> 。拿到正文文本后，就需要做NLP来提取主题关键字了。</li>
 </ol>
-<hr>
-<h2 id="网页爬虫"><a href="#网页爬虫" class="headerlink" title="网页爬虫"></a>网页爬虫</h2><p>这里的网页爬虫和一般的爬虫还不太一样，会简单许多，主要是把原始网页的HTML抓下来即可，主要是为后续的分析挖掘打下基础，属于数据采集的阶段。 </p>
-<p>这里我们采用了Python的<code>requests</code>包。<code>requests</code>相对于Python自带的<code>urllib</code>来说，API更为人性化，鲁棒性也更好。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">r = request.get(url)</span><br><span class="line">r.encoding=<span class="string">'utf-8'</span></span><br><span class="line">html = r.text</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="正文提取"><a href="#正文提取" class="headerlink" title="正文提取"></a>正文提取</h2><p>通过研究爬取下来的原始HTML，我们可以看到是非常负责而且杂乱无章的，充斥着大量的js代码等。我们首先需要解析HTML，尽量过滤掉js代码，留下文本内容。 </p>
-<p>这里我们采用了Python的<code>BeautifulSoup</code>包。这个包堪称Python一大神器，解析HTML效果非常好</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, features=<span class="string">"html.parser"</span>)</span><br><span class="line"><span class="keyword">for</span> script <span class="keyword">in</span> soup([<span class="string">"script"</span>, <span class="string">"style"</span>]):</span><br><span class="line">    script.decompose()</span><br><span class="line">text = soup.get_text()</span><br></pre></td></tr></table></figure>
-
-<p>我们想要的是网页的正文内容，其他的诸如广告或者导航栏等干扰内容需要尽可能的过滤掉。通过<code>BeautifulSoup</code>可以解析出整个HTML的DOM树结构，但是每个网页HTML的写法各不相同，单纯靠HTML解析无法做到通用，因此我们需要跳出HTML的思维，使用其他的方法来提取网页的正文。这里有个很优雅的方式是“基于行块分布函数”的算法<code>cx-extractor</code>。</p>
-<blockquote>
-<p>基于行块分布函数的通用网页正文抽取：线性时间、不建DOM树、与HTML标签无关<br>对于Web信息检索来说，网页正文抽取是后续处理的关键。虽然使用正则表达式可以准确的抽取某一固定格式的页面，但面对形形色色的HTML，使用规则处理难免捉襟见肘。能不能高效、准确的将一个页面的正文抽取出来，并做到在大规模网页范围内通用，这是一个直接关系上层应用的难题。<br><a href="http://weibo.com/cx3180" target="_blank" rel="noopener">作者</a> 提出了 <a href="http://cx-extractor.googlecode.com/files/%E5%9F%BA%E4%BA%8E%E8%A1%8C%E5%9D%97%E5%88%86%E5%B8%83%E5%87%BD%E6%95%B0%E7%9A%84%E9%80%9A%E7%94%A8%E7%BD%91%E9%A1%B5%E6%AD%A3%E6%96%87%E6%8A%BD%E5%8F%96%E7%AE%97%E6%B3%95.pdf" target="_blank" rel="noopener">《基于行块分布函数的通用网页正文抽取算法》</a> ，首次将网页正文抽取问题转化为求页面的行块分布函数，这种方法不用建立Dom树，不被病态HTML所累（事实上与HTML标签完全无关）。通过在线性时间内建立的行块分布函数图，直接准确定位网页正文。同时采用了统计与规则相结合的方法来处理通用性问题。作者相信简单的事情总应该用最简单的办法来解决这一亘古不变的道理。整个算法实现代码不足百行。但量不在多，在法。</p>
-</blockquote>
-<p><img src="https://github.com/chrislinan/cx-extractor-python/raw/master/img/2.png" alt><br>上图就是某个页面求出的行块分布函数曲线。该网页的正文区域为145行至182行，即分布函数图上含有最值且连续的一个区域，这个区域往往含有一个骤升点和一个骤降点，因此，网页正文抽取问题转化为了求行块分布函数上的骤升点和骤降点两个边节点。 这里我们采用了这个算法的Python实现<a href="https://github.com/chrislinan/cx-extractor-python" target="_blank" rel="noopener">GitHub - chrislinan/cx-extractor-python</a>：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> CxExtractor <span class="keyword">import</span> CxExtractor</span><br><span class="line">cx = CxExtractor(threshold=<span class="number">40</span>)</span><br><span class="line">text = cx.getText(text)</span><br><span class="line">texts = text.split(<span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="主题模型"><a href="#主题模型" class="headerlink" title="主题模型"></a>主题模型</h2><p>拿到网页正文内容文本后，就需要提取正文主题关键词了。常见做法有3种： </p>
-<ol>
-<li>TFIDF </li>
-<li>Text-Rank </li>
-<li>LSI/LDA </li>
-</ol>
-<p>这里我们先采用TFIDF的方式来做。</p>
-<blockquote>
-<p>TFIDF(Term Frequency Inverse Document Frequency)是一种用于信息检索与数据挖掘的常用加权技术。 词频（TF）=某个词在文本中出现的次数/该文本中总词数 逆向文档频（IDF）=log(语料库中所有文档总数/(包含某词的文档数+1)) 我们通过TF，也就是某个词在文本中出现的频度，来提升这个词在主题中的权重，然后我们通过IDF值，即逆向文档频来降低公共词的主题权重。TF*IDF也就得到了我们要的主题词权重。</p>
-</blockquote>
-<p>做TFIDF，首先步骤是分词。分词的效果取决于词典的构建，且对后续关键词提取影响巨大。首先要基于分析的行业主题建立专用词典，然后还需要维护停用词的词典。有了词典后，我们就可以采用Python分词的神器<code>jieba</code>来处理分词。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jieba</span><br><span class="line">jieba.load_userdict(<span class="string">'./dict.txt'</span>)    <span class="comment">#自定义词典</span></span><br><span class="line">stopwords = set([line.strip() <span class="keyword">for</span> line <span class="keyword">in</span> open(<span class="string">'stopwords.txt'</span>, <span class="string">'r'</span>, encoding=<span class="string">'utf-8'</span>).readlines()])   <span class="comment">#停用词典</span></span><br><span class="line">    </span><br><span class="line">word_lists = []</span><br><span class="line"><span class="keyword">for</span> text <span class="keyword">in</span> texts:</span><br><span class="line">    word_lists += (list(jieba.cut(text, cut_all=<span class="literal">False</span>)))</span><br><span class="line">word_lists = [w <span class="keyword">for</span> w <span class="keyword">in</span> word_lists <span class="keyword">if</span> <span class="keyword">not</span> is_stop_word(w)]</span><br></pre></td></tr></table></figure>
-
-<p>分词完毕后，我们就可以计算TFIDF了。可以通过<code>gensim</code>，<code>scikit-learn</code>等机器学习专用包来做，<code>jieba</code>本身也提供这个功能，这里我们直接用<code>jieba</code>。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jieba.analyse</span><br><span class="line">keywords = jieba.analyse.extract_tags(<span class="string">' '</span>.join(word_lists), topK=<span class="number">20</span>, withWeight=<span class="literal">True</span>, allowPOS=[<span class="string">'n'</span>, <span class="string">'ns'</span>, <span class="string">'nr'</span>, <span class="string">'nt'</span>, <span class="string">'nz'</span>])</span><br></pre></td></tr></table></figure>
-
-<p>注意这里有个参数是<code>allowPOS</code>，按照词性过滤。这个需要根据实际的业务需求来设置。</p>
-<blockquote>
-<p>词性标注(Part-Of-Speech Tagging, POS tagging)，是语料库语言学中将语料库内单词的词性按照其含义和上下文内容进行标记的文本数据处理技术。常见标注示例：<br>n 名词<br>nr 人名<br>ns 地名<br>nt 机构团体<br>nz 其他专名<br>a 形容词<br>v 动词</p>
-</blockquote>
-<hr>
-<h2 id="服务"><a href="#服务" class="headerlink" title="服务"></a>服务</h2><p>到这里，我们的关键词提取就结束了，为了方便其他同学来使用，我们可以用<code>Flask</code>做一个restful api，输入为网址url，输出为提取出的关键词并排序。</p>
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在这篇文章里，我们完成了从任意网页url提取正文主题关键词的功能。在主题模型这块采用了常见的TFIDF的算法来解决，可以快速出一个原型提供给业务方使用。后续我们会继续优化，采用更多的算法来进一步提升效果。</p>
-
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/web-topic-extractor/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
@@ -1719,6 +1249,7 @@
   
 
   
+
 
 </body>
 </html>

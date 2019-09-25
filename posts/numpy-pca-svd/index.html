@@ -59,7 +59,7 @@
 <meta name="keywords" content="SVD,PCA">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用numpy来理解PCA和SVD">
-<meta property="og:url" content="https://ethaniz.github.io/2019/09/numpy-pca-svd/index.html">
+<meta property="og:url" content="https://ethaniz.github.io/posts/numpy-pca-svd/index.html">
 <meta property="og:site_name" content="机器学习之道">
 <meta property="og:description" content="前言线性代数是高等数学里面非常重要的一门课程，可惜在学校的时候是一种自底向上的学习方式，并不知道学出来有什么用，以致彻底沦为应试教育。后来在工作中接触了机器学习，才真正看到了“数学之美”，才发现线性代数是多么的优雅多么的有用。 今天我们来看看下线性代数中非常重要的一个知识点奇异值分解SVD Singular value decomposition。SVD在数据科学当中非常有用，其常见的应用包括：">
 <meta property="og:locale" content="en">
@@ -70,12 +70,12 @@
 <meta property="og:image" content="https://i.loli.net/2019/09/23/MExt5oDK7NiFUca.png">
 <meta property="og:image" content="https://i.loli.net/2019/09/23/ZmnwjSJWsl89r4T.png">
 <meta property="og:image" content="https://i.loli.net/2019/09/23/fAr1CLG42UbenPm.png">
-<meta property="og:updated_time" content="2019-09-25T08:21:13.228Z">
+<meta property="og:updated_time" content="2019-09-25T10:20:53.211Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用numpy来理解PCA和SVD">
 <meta name="twitter:description" content="前言线性代数是高等数学里面非常重要的一门课程，可惜在学校的时候是一种自底向上的学习方式，并不知道学出来有什么用，以致彻底沦为应试教育。后来在工作中接触了机器学习，才真正看到了“数学之美”，才发现线性代数是多么的优雅多么的有用。 今天我们来看看下线性代数中非常重要的一个知识点奇异值分解SVD Singular value decomposition。SVD在数据科学当中非常有用，其常见的应用包括：">
 <meta name="twitter:image" content="https://i.loli.net/2019/09/23/mzrW9QjaBZhcu3x.jpg">
-  <link rel="canonical" href="https://ethaniz.github.io/2019/09/numpy-pca-svd/">
+  <link rel="canonical" href="https://ethaniz.github.io/posts/numpy-pca-svd/">
 
 
 <script id="page-configurations">
@@ -239,7 +239,7 @@
   
   
   <div class="post-block post">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/numpy-pca-svd/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/numpy-pca-svd/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -278,7 +278,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 16:21:13" itemprop="dateModified" datetime="2019-09-25T16:21:13+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:20:53" itemprop="dateModified" datetime="2019-09-25T18:20:53+08:00">2019-09-25</time>
               </span>
             
           
@@ -316,6 +316,8 @@
 <li>降维常用套路Principal Component Analysis</li>
 </ul>
 <p>LSA已经在前文中有所讲解，CF的话后面在推荐系统的专题中来写，今天主要聊聊PCA，以及SVD在PCA中的重要作用。同样延续我们“手撕”的传统，使用numpy来理解其中的原理。</p>
+<a id="more"></a>
+
 <hr>
 <h2 id="PCA"><a href="#PCA" class="headerlink" title="PCA"></a>PCA</h2><p><a href="https://en.wikipedia.org/wiki/Principal_component_analysis" target="_blank" rel="noopener">Principal component analysis</a>即<strong>主成分分析</strong>，是机器学习中一种非常常用的降维方式。其发源也是源自于早期的计算机处理能力有限，当数据样本的维度很高时，预先去除掉数据中的一些冗余信息和噪声（降维），使得数据变得更加简单高效，节省时间和成本。 </p>
 <p>在深度学习时代，更强调的是原始数据的直接输入，再通过神经网络来做降维工作，最典型是场景就是计算机视觉，直接输入原始图片像素信息，通过CNN<strong>卷积层</strong>、<strong>MaxPooling层</strong>来进行降维。因此PCA逐渐开始淡出人们的视线，通常是作为一种数据可视化的手段（二维图表无法展示多维的数据样本）。 </p>
@@ -433,7 +435,7 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2019/09/return-sequences-keras/" rel="next" title="Keras中return_sequences和return_state有什么用？">
+                <a href="/posts/keras-return-sequences-return-state/" rel="next" title="Keras中return_sequences和return_state有什么用？">
                   <i class="fa fa-chevron-left"></i> Keras中return_sequences和return_state有什么用？
                 </a>
               
@@ -459,6 +461,9 @@
 
           </div>
           
+    
+    <div class="comments" id="gitalk-container"></div>
+  
 
         </div>
           
@@ -639,6 +644,25 @@
   
 
   
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'cb5f02dcae7fb041a28a',
+      clientSecret: 'af1050d07337b233d629af013bda2856c23932a5',
+      repo: 'ethaniz.github.io',
+      owner: 'ethaniz',
+      admin: ['ethaniz'],
+      id: 'dc10febd0d6eab6e3f7003ec8a3c4fa2',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
 
 </body>
 </html>

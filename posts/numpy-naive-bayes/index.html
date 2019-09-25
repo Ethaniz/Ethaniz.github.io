@@ -55,13 +55,13 @@
   };
 </script>
 
-  <meta name="description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。  数据准备为了demo方便">
+  <meta name="description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。">
 <meta name="keywords" content="朴素贝叶斯">
 <meta property="og:type" content="article">
 <meta property="og:title" content="numpy“手撕”朴素贝叶斯">
-<meta property="og:url" content="https://ethaniz.github.io/2019/09/numpy-naive-bayes/index.html">
+<meta property="og:url" content="https://ethaniz.github.io/posts/numpy-naive-bayes/index.html">
 <meta property="og:site_name" content="机器学习之道">
-<meta property="og:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。  数据准备为了demo方便">
+<meta property="og:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg">
 <meta property="og:image" content="https://i.loli.net/2019/09/18/NqnoSiWPHYjQtMX.png">
@@ -76,12 +76,12 @@
 <meta property="og:image" content="https://i.loli.net/2019/09/18/PvLX4c8B13m2IbJ.png">
 <meta property="og:image" content="https://i.loli.net/2019/09/18/usVptoylQwMiZGh.png">
 <meta property="og:image" content="https://i.loli.net/2019/09/18/mS8YliHW3fjbyFQ.png">
-<meta property="og:updated_time" content="2019-09-25T07:00:26.986Z">
+<meta property="og:updated_time" content="2019-09-25T10:24:24.694Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="numpy“手撕”朴素贝叶斯">
-<meta name="twitter:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。  数据准备为了demo方便">
+<meta name="twitter:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。">
 <meta name="twitter:image" content="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg">
-  <link rel="canonical" href="https://ethaniz.github.io/2019/09/numpy-naive-bayes/">
+  <link rel="canonical" href="https://ethaniz.github.io/posts/numpy-naive-bayes/">
 
 
 <script id="page-configurations">
@@ -245,7 +245,7 @@
   
   
   <div class="post-block post">
-    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/numpy-naive-bayes/">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/posts/numpy-naive-bayes/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -284,7 +284,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-25 15:00:26" itemprop="dateModified" datetime="2019-09-25T15:00:26+08:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 18:24:24" itemprop="dateModified" datetime="2019-09-25T18:24:24+08:00">2019-09-25</time>
               </span>
             
           
@@ -314,6 +314,8 @@
 
       
         <p><img src="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg" alt><br>常见的python朴素贝叶斯算法的方式，都是使用<code>for循环</code>来统计各个<code>p(特征|类型)</code>的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即<strong>vectorization</strong>。通过各种矩阵运算来去除<code>for循环</code>，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来<strong>手撕</strong>朴素贝叶斯算法，带你领略机器学习中的向量化之道。</p>
+<a id="more"></a>
+
 <hr>
 <h2 id="数据准备"><a href="#数据准备" class="headerlink" title="数据准备"></a>数据准备</h2><p>为了demo方便，我们先伪造一些数据。这里伪造的是NLP情感分类的数据。分为两部门<code>train</code>和<code>valid</code>，标签分为1和0，1代表侮辱性文字，0代表正常言论。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">train = [<span class="string">'my dog had flea problems help help please'</span>,</span><br><span class="line">        <span class="string">'mybe not take him to dog park stupid dog'</span>,</span><br><span class="line">        <span class="string">'my dalmation is so cute I love him'</span>,</span><br><span class="line">        <span class="string">'stop posting stupid worthless garbage'</span>,</span><br><span class="line">        <span class="string">'mr licks ate my steak how to stop him'</span>,]</span><br><span class="line">valid = [<span class="string">'my stupid stupid worthless dog'</span>]</span><br><span class="line">label = [<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>]</span><br><span class="line">valid_y = [<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
@@ -440,7 +442,7 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2019/09/why-start-writting/" rel="next" title="为什么我要开始写作？">
+                <a href="/posts/why-start-writting/" rel="next" title="为什么我要开始写作？">
                   <i class="fa fa-chevron-left"></i> 为什么我要开始写作？
                 </a>
               
@@ -450,7 +452,7 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2019/09/return-sequences-keras/" rel="prev" title="Keras中return_sequences和return_state有什么用？">
+                <a href="/posts/keras-return-sequences-return-state/" rel="prev" title="Keras中return_sequences和return_state有什么用？">
                   Keras中return_sequences和return_state有什么用？ <i class="fa fa-chevron-right"></i>
                 </a>
               
@@ -470,6 +472,9 @@
 
           </div>
           
+    
+    <div class="comments" id="gitalk-container"></div>
+  
 
         </div>
           
@@ -650,6 +655,25 @@
   
 
   
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'cb5f02dcae7fb041a28a',
+      clientSecret: 'af1050d07337b233d629af013bda2856c23932a5',
+      repo: 'ethaniz.github.io',
+      owner: 'ethaniz',
+      admin: ['ethaniz'],
+      id: 'bfc2916ef25ab81c8cb068d1e0eaa106',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
 
 </body>
 </html>
