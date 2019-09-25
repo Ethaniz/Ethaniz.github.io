@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言线性代数是高等数学里面非常重要的一门课程，可惜在学校的时候是一种自底向上的学习方式，并不知道学出来有什么用，以致彻底沦为应试教育。后来在工作中接触了机器学习，才真正看到了“数学之美”，才发现线性代数是多么的优雅多么的有用。 今天我们来看看下线性代数中非常重要的一个知识点奇异值分解SVD Singular value decomposition。SVD在数据科学当中非常有用，其常见的应用包括：">
+<meta name="keywords" content="SVD,PCA">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用numpy来理解PCA和SVD">
+<meta property="og:url" content="https://ethaniz.github.io/2019/09/numpy-pca-svd/index.html">
+<meta property="og:site_name" content="机器学习之道">
+<meta property="og:description" content="前言线性代数是高等数学里面非常重要的一门课程，可惜在学校的时候是一种自底向上的学习方式，并不知道学出来有什么用，以致彻底沦为应试教育。后来在工作中接触了机器学习，才真正看到了“数学之美”，才发现线性代数是多么的优雅多么的有用。 今天我们来看看下线性代数中非常重要的一个知识点奇异值分解SVD Singular value decomposition。SVD在数据科学当中非常有用，其常见的应用包括：">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://i.loli.net/2019/09/23/mzrW9QjaBZhcu3x.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/09/23/UK4fEwg63QFB9Jq.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/23/ZmnwjSJWsl89r4T.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/23/2dnGmzrZANiUIq5.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/23/MExt5oDK7NiFUca.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/23/ZmnwjSJWsl89r4T.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/23/fAr1CLG42UbenPm.png">
+<meta property="og:updated_time" content="2019-09-25T08:21:13.228Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用numpy来理解PCA和SVD">
+<meta name="twitter:description" content="前言线性代数是高等数学里面非常重要的一门课程，可惜在学校的时候是一种自底向上的学习方式，并不知道学出来有什么用，以致彻底沦为应试教育。后来在工作中接触了机器学习，才真正看到了“数学之美”，才发现线性代数是多么的优雅多么的有用。 今天我们来看看下线性代数中非常重要的一个知识点奇异值分解SVD Singular value decomposition。SVD在数据科学当中非常有用，其常见的应用包括：">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/23/mzrW9QjaBZhcu3x.jpg">
+  <link rel="canonical" href="https://ethaniz.github.io/2019/09/numpy-pca-svd/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>使用numpy来理解PCA和SVD | 机器学习之道</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">机器学习之道</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Zen of Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-schedule">
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/numpy-pca-svd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="异尘">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="机器学习之道">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">使用numpy来理解PCA和SVD
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              
+                
+              
+
+              <time title="Created: 2019-09-23 14:52:16" itemprop="dateCreated datePublished" datetime="2019-09-23T14:52:16+08:00">2019-09-23</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2019-09-25 16:21:13" itemprop="dateModified" datetime="2019-09-25T16:21:13+08:00">2019-09-25</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://i.loli.net/2019/09/23/mzrW9QjaBZhcu3x.jpg" alt></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>线性代数是高等数学里面非常重要的一门课程，可惜在学校的时候是一种自底向上的学习方式，并不知道学出来有什么用，以致彻底沦为应试教育。后来在工作中接触了机器学习，才真正看到了“数学之美”，才发现线性代数是多么的优雅多么的有用。</p>
+<p>今天我们来看看下线性代数中非常重要的一个知识点<strong>奇异值分解</strong>SVD <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition" target="_blank" rel="noopener">Singular value decomposition</a>。SVD在数据科学当中非常有用，其常见的应用包括： </p>
+<ul>
+<li>自然语言处理中的Latent Semantic Analysis </li>
+<li>推荐系统中的Collaborative Filtering </li>
+<li>降维常用套路Principal Component Analysis</li>
+</ul>
+<p>LSA已经在前文中有所讲解，CF的话后面在推荐系统的专题中来写，今天主要聊聊PCA，以及SVD在PCA中的重要作用。同样延续我们“手撕”的传统，使用numpy来理解其中的原理。</p>
+<hr>
+<h2 id="PCA"><a href="#PCA" class="headerlink" title="PCA"></a>PCA</h2><p><a href="https://en.wikipedia.org/wiki/Principal_component_analysis" target="_blank" rel="noopener">Principal component analysis</a>即<strong>主成分分析</strong>，是机器学习中一种非常常用的降维方式。其发源也是源自于早期的计算机处理能力有限，当数据样本的维度很高时，预先去除掉数据中的一些冗余信息和噪声（降维），使得数据变得更加简单高效，节省时间和成本。 </p>
+<p>在深度学习时代，更强调的是原始数据的直接输入，再通过神经网络来做降维工作，最典型是场景就是计算机视觉，直接输入原始图片像素信息，通过CNN<strong>卷积层</strong>、<strong>MaxPooling层</strong>来进行降维。因此PCA逐渐开始淡出人们的视线，通常是作为一种数据可视化的手段（二维图表无法展示多维的数据样本）。 </p>
+<p>其实，在深度学习目前尚未全面攻克的结构化数据领域，PCA仍然有较多的用，其数据处理的思路依然值得我们去学习揣摩。 </p>
+<h3 id="PCA正常解法"><a href="#PCA正常解法" class="headerlink" title="PCA正常解法"></a>PCA正常解法</h3><p>PCA算法的本质，其实就是找到一些投影方向，使得数据在这些投影方向上的方差最大，且这些投影方向是相互正交的。找到新的<strong>正交基</strong>后，计算原始数据在这些正交基上<strong>投影</strong>的方差，方差越大，就说明对应正交基上包含了更多的信息量。 </p>
+<p>关于原始数据的方差，最好的一个工具就是<strong>协方差矩阵</strong>了。协方差矩阵的<strong>特征值</strong>越大，对应的方差也就越大，在对应的<strong>特征向量</strong>上投影的信息量就越大。因此，我们如果将小特征值对应方向的数据删除，就可以达到降维的目的。因此，在数学上，我们可以把问题转化为求原始数据的协方差矩阵，然后计算协方差矩阵的特征值与特征向量。 </p>
+<p>对于广大程序员来说，学习机器学习最重要的一个坎还是数学。很多实际的代码其实是公式推导后的结果的代码实现，如果没有理清公式推导的过程，那么最后肯定是一头雾水。所以，克服心中的恐惧，翻出压在箱底的《线性代数》，我们上。 </p>
+<p>首先，求原始数据X的协方差矩阵C，将原始矩阵中心化后，做如下操作</p>
+<div align="center">
+    <img width="120" height="80" src="https://i.loli.net/2019/09/23/UK4fEwg63QFB9Jq.png">
+</div>
+
+<p>接着，由于协方差矩阵C是方阵，就可以通过特征分解的方式来求C的特征值和特征向量。</p>
+<div align="center">
+    <img width="140" height="40" src="https://i.loli.net/2019/09/23/ZmnwjSJWsl89r4T.png">
+</div>
+
+<p>最后，选择最大的k个特征值进行保留，求X的k阶PCA（<strong>X右乘k阶特征向量</strong>）</p>
+<div align="center">
+    <img width="120" height="40" src="https://i.loli.net/2019/09/23/2dnGmzrZANiUIq5.png">
+</div>
+
+<h3 id="用SVD来解PCA"><a href="#用SVD来解PCA" class="headerlink" title="用SVD来解PCA"></a>用SVD来解PCA</h3><p>根据上面的推导，我们已经可以对矩阵X做PCA了。同学们可能要问了，这跟SVD有什么关系呢？ </p>
+<p>工程化思维强的同学应该已经想到了，这种纯数学的解法，在实际工程实践中有以下问题： </p>
+<ul>
+<li>在数据量很大时，把原始矩阵进行转置求协方差矩阵，然后再进行特征值分解是一个非常慢的过程。 </li>
+<li>稳定性问题。可以看到X转置乘以X，如果矩阵有非常小的数，很容易在平方中丢失。 </li>
+</ul>
+<p>工业界中，还是“<strong>唯快不破</strong>，<strong>唯稳不破</strong>”。我们知道，奇异值分解相对特征分解，有个很大的优势就是不要求原始矩阵是方阵。这非常符合现实生活中的数据。因此，有大神想到，是否可以用svd来解PCA？推导如下： </p>
+<p>我们根据协方差矩阵的公式，把X按照奇异值分解展开，注意后面应用到了一个<strong>酋矩阵</strong>(unitary)的特性：</p>
+<div align="center">
+    <img width="400" height="260" src="https://i.loli.net/2019/09/23/MExt5oDK7NiFUca.png">
+</div>
+
+<p>看到最后的结果，是否跟上面的</p>
+<div align="center">
+    <img width="140" height="38" src="https://i.loli.net/2019/09/23/ZmnwjSJWsl89r4T.png">
+</div>
+
+<p>很像？没错。协方差矩阵C的特征值和X的奇异值有以下关系</p>
+<div align="center">
+    <img width="140" height="76" src="https://i.loli.net/2019/09/23/fAr1CLG42UbenPm.png">
+</div>
+
+<p>而<strong>C的特征向量即为X的SVD分解后的V向量</strong>, 则参考PCA正常解法，X的k阶PCA即为_X右乘k阶V向量_。因此这种方式求PCA，只需要把原始矩阵做一次SVD分解即可，不用转置，不用求协方差矩阵。事实上，在<code>Scikit Learn</code>等机器学习框架中，就是用的SVD来做PCA。</p>
+<hr>
+<h2 id="用numpy来验证"><a href="#用numpy来验证" class="headerlink" title="用numpy来验证"></a>用numpy来验证</h2><h3 id="numpy原始解法求PCA"><a href="#numpy原始解法求PCA" class="headerlink" title="numpy原始解法求PCA"></a>numpy原始解法求PCA</h3><p>接下来，我们用numpy来验证这种思路。首先是PCA的标准解法： 随机模拟一个原始数据矩阵，5个样本，3个特征：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">X = np.random.rand(<span class="number">5</span>,<span class="number">3</span>)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([[0.86568791, 0.73022945, 0.17982869],</span></span><br><span class="line"><span class="string">       [0.07201287, 0.99358411, 0.84389196],</span></span><br><span class="line"><span class="string">       [0.61267696, 0.08867997, 0.11770573],</span></span><br><span class="line"><span class="string">       [0.16898969, 0.3093472 , 0.9010064 ],</span></span><br><span class="line"><span class="string">       [0.43840269, 0.97250927, 0.64897872]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>将矩阵中心化，即减去均值：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">X_new = X - np.mean(X, axis=<span class="number">0</span>)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([[ 0.43413389,  0.11135945, -0.35845361],</span></span><br><span class="line"><span class="string">       [-0.35954115,  0.37471411,  0.30560966],</span></span><br><span class="line"><span class="string">       [ 0.18112294, -0.53019003, -0.42057657],</span></span><br><span class="line"><span class="string">       [-0.26256433, -0.3095228 ,  0.3627241 ],</span></span><br><span class="line"><span class="string">       [ 0.00684866,  0.35363927,  0.11069642]])</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># 确保结果正确，即转换后均值为0</span></span><br><span class="line">np.allclose(X_new.mean(axis=<span class="number">0</span>), np.zeros(X_new.shape[<span class="number">1</span>]))</span><br></pre></td></tr></table></figure>
+
+<p>求X_new的协方差矩阵C</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">C = np.dot(X_new.T, X_new) / (X_new.shape[<span class="number">0</span>] - <span class="number">1</span>)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">C</span></span><br><span class="line"><span class="string">array([[ 0.10488363, -0.02467955, -0.10903811],</span></span><br><span class="line"><span class="string">       [-0.02467955,  0.16369454,  0.05611495],</span></span><br><span class="line"><span class="string">       [-0.10903811,  0.05611495,  0.13564834]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>求C的特征值和特征向量，这里用的是numpy的特征分解函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">eig_vals, eig_vecs = np.linalg.eig(C)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">eig_vals</span></span><br><span class="line"><span class="string">array([0.26474535, 0.00779743, 0.13168373])</span></span><br><span class="line"><span class="string">eig_vecs</span></span><br><span class="line"><span class="string">array([[-0.53801107,  0.72610049, -0.42816139],</span></span><br><span class="line"><span class="string">       [ 0.50584138, -0.12820944, -0.85304562],</span></span><br><span class="line"><span class="string">       [ 0.67429117,  0.67552974,  0.29831358]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>求X的PCA结果，就是X右乘k阶特征向量。这里k还是取的3。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">X_pca = np.dot(X_new, eig_vecs)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([[-0.41894072,  0.05880142, -0.38780564],</span></span><br><span class="line"><span class="string">       [ 0.58905292, -0.10265648, -0.07453908],</span></span><br><span class="line"><span class="string">       [-0.64922927, -0.08462316,  0.24926273],</span></span><br><span class="line"><span class="string">       [ 0.22927473,  0.09406657,  0.4846625 ],</span></span><br><span class="line"><span class="string">       [ 0.24984234,  0.03441165, -0.27158052]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="numpy的SVD求PCA"><a href="#numpy的SVD求PCA" class="headerlink" title="numpy的SVD求PCA"></a>numpy的SVD求PCA</h3><p>首先，直接求X_new的SVD，同样使用numpy的函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注意这里的Vh其实是公式中的VT</span></span><br><span class="line">U, Sigma, Vh = np.linalg.svd(X_new, full_matrices=<span class="literal">False</span>, compute_uv=<span class="literal">True</span>)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">U</span></span><br><span class="line"><span class="string">array([[-0.40710685,  0.53434046,  0.33295236,  0.59843699, -0.28241844],</span></span><br><span class="line"><span class="string">       [ 0.57241386,  0.10270414, -0.58127362,  0.5471169 , -0.15677466],</span></span><br><span class="line"><span class="string">       [-0.63089041, -0.34344824, -0.47916326,  0.32579597,  0.38507162],</span></span><br><span class="line"><span class="string">       [ 0.22279838, -0.66779531,  0.53263483,  0.46842625,  0.03587876],</span></span><br><span class="line"><span class="string">       [ 0.24278501,  0.37419895,  0.19484969,  0.13026931,  0.86376738]])</span></span><br><span class="line"><span class="string">Sigma</span></span><br><span class="line"><span class="string">array([1.02906823, 0.72576506, 0.17660612])</span></span><br><span class="line"><span class="string">Vh</span></span><br><span class="line"><span class="string">array([[-0.53801107,  0.50584138,  0.67429117],</span></span><br><span class="line"><span class="string">       [ 0.42816139,  0.85304562, -0.29831358],</span></span><br><span class="line"><span class="string">       [ 0.72610049, -0.12820944,  0.67552974]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>我们来根据上面的公式，确认下eig_vals和S的关系，注意在numpy的实现中，特征值和奇异值的排序是不同的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">np.allclose(eig_vals, np.square(S) / (X_new.shape[<span class="number">0</span>] - <span class="number">1</span>))</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">eig_vals</span></span><br><span class="line"><span class="string">array([0.26474535, 0.00779743, 0.13168373])</span></span><br><span class="line"><span class="string">np.square(S) / (X_new.shape[0] - 1)</span></span><br><span class="line"><span class="string">array([0.26474535, 0.13168373, 0.00779743])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>从结果看出，确实跟公式是一致的。 接下来用SVD求PCA就简单了，直接右乘V即可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注意Vh是公式中的VT，因此V=Vh.T</span></span><br><span class="line">X_pca_svd = np.dot(X_new, Vh.T)</span><br><span class="line"><span class="comment"># X_pca_svd = np.dot(U, np.diag(Sigma))</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">X_pca_svd</span></span><br><span class="line"><span class="string">array([[-0.41894072,  0.38780564,  0.05880142],</span></span><br><span class="line"><span class="string">       [ 0.58905292,  0.07453908, -0.10265648],</span></span><br><span class="line"><span class="string">       [-0.64922927, -0.24926273, -0.08462316],</span></span><br><span class="line"><span class="string">       [ 0.22927473, -0.4846625 ,  0.09406657],</span></span><br><span class="line"><span class="string">       [ 0.24984234,  0.27158052,  0.03441165]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>求出结果后，正当我们信心满满的对比一下<code>X_pca</code>和<code>X_pca_svd</code>,以为大功告成打完收工时，却发现二者是不一致的。WTF？ </p>
+<h3 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h3><p>仔细研究下<code>X_pca</code>和<code>X_pca_svd</code>的结果，可以看出，排除特征值和奇异值的排序导致的列向量顺序不同外，部分列向量的绝对值相同但正负不同。 </p>
+<p>问题出在哪里？我们搬出<code>Scikit Learn</code>，再来算一次PCA：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.decomposition <span class="keyword">import</span> PCA</span><br><span class="line"></span><br><span class="line">pca = PCA(<span class="number">3</span>)</span><br><span class="line">pca.fit_transform(X)   <span class="comment"># sklearn自动处理去均值化</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([[ 0.41894072, -0.38780564, -0.05880142],</span></span><br><span class="line"><span class="string">       [-0.58905292, -0.07453908,  0.10265648],</span></span><br><span class="line"><span class="string">       [ 0.64922927,  0.24926273,  0.08462316],</span></span><br><span class="line"><span class="string">       [-0.22927473,  0.4846625 , -0.09406657],</span></span><br><span class="line"><span class="string">       [-0.24984234, -0.27158052, -0.03441165]])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>嗯，也是绝对值相同但正负不同。都说<code>Scikit Learn</code>的PCA就是SVD做的，难道是骗人的？ 好在代码不会骗人，我们直接翻出源码。</p>
+<p>通过研究<code>Scikit Learn</code>的源码<a href="https://github.com/scikit-learn/scikit-learn/blob/4c65d8e615c9331d37cbb6225c5b67c445a5c959/sklearn/utils/extmath.py#L609" target="_blank" rel="noopener">svd_flip@scikit-learn/extmath.py</a>找到了答案： SVD奇异值分解的结果是唯一的，但是分解出来的U矩阵和V矩阵的正负可以不是唯一，只要保证它们乘起来是一致的就行。因此，sklearn为了保证svd分解结果的一致性，它们的方案是：保证U矩阵的每一行(<code>u_i</code>)中，绝对值最大的元素一定是正数，否则将<code>u_i</code>转成<code>-u_i</code>,并将相应的<code>v_i</code>转成<code>-v_i</code>已保证结果的一致。 </p>
+<p>这又是数学与工程的问题了。在数学上，几种结果都是正确的。但是在工程上，有个很重要的特性叫<strong>幂等性</strong>(Idempotence)。</p>
+<blockquote>
+<p>Methods can also have the property of “idempotence” in that (aside from error or expiration issues) the side-effects of N &gt; 0 identical requests is the same as for a single request.</p>
+</blockquote>
+<p>这是源自于HTTP规范中的一个概念，可以引申至各种分布式服务的设计当中，即：高质量的服务，一次请求和多次请求，其副作用（结果）应当是一致的。<code>Scikit Learn</code>正是通过<code>svd_flip</code>这个函数，把一个数学上并不幂等的操作，转化成了幂等的服务，其设计之讲究可见一斑。</p>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文通过公式推导和numpy代码实战，展示了PCA的正常解法，以及工业界常用的SVD解法，并最后引申至数学和实现的一些探讨。“part-science, part-art”，这就是我最喜爱的机器学习之道</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/SVD/" rel="tag"># SVD</a>
+            
+              <a href="/tags/PCA/" rel="tag"># PCA</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/return-sequences-keras/" rel="next" title="Keras中return_sequences和return_state有什么用？">
+                  <i class="fa fa-chevron-left"></i> Keras中return_sequences和return_state有什么用？
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PCA"><span class="nav-number">2.</span> <span class="nav-text">PCA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PCA正常解法"><span class="nav-number">2.1.</span> <span class="nav-text">PCA正常解法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用SVD来解PCA"><span class="nav-number">2.2.</span> <span class="nav-text">用SVD来解PCA</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用numpy来验证"><span class="nav-number">3.</span> <span class="nav-text">用numpy来验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#numpy原始解法求PCA"><span class="nav-number">3.1.</span> <span class="nav-text">numpy原始解法求PCA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#numpy的SVD求PCA"><span class="nav-number">3.2.</span> <span class="nav-text">numpy的SVD求PCA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结果分析"><span class="nav-number">3.3.</span> <span class="nav-text">结果分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg"
+      alt="异尘">
+  <p class="site-author-name" itemprop="name">异尘</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.zhihu.com/people/yi-chen-25-73" title="知乎 &rarr; https://www.zhihu.com/people/yi-chen-25-73" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>知乎</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">异尘</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

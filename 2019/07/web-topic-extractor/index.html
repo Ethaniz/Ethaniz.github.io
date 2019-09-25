@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言网页正文内容主题提取，即任意给一个网页url，通过爬取网页内容和文本分析，得出该网页内容的关键词，作为网页的标签。这些关键词和标签在做流量分析_内容推荐方面有非常重要的意义。比如说我们做数字营销，用过页面来做用户引流，我们就可以知道吸引用户过来的点是什么，用户的潜在需求是什么；另外，针对内容社区的用户画像/推荐系统，关键点也是文章/页面的主题和标签。  这个任务涉及的技术点主要有以下几个：">
+<meta name="keywords" content="Topic Model,TFIDF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="任意网页正文内容主题词提取">
+<meta property="og:url" content="https://ethaniz.github.io/2019/07/web-topic-extractor/index.html">
+<meta property="og:site_name" content="机器学习之道">
+<meta property="og:description" content="前言网页正文内容主题提取，即任意给一个网页url，通过爬取网页内容和文本分析，得出该网页内容的关键词，作为网页的标签。这些关键词和标签在做流量分析_内容推荐方面有非常重要的意义。比如说我们做数字营销，用过页面来做用户引流，我们就可以知道吸引用户过来的点是什么，用户的潜在需求是什么；另外，针对内容社区的用户画像/推荐系统，关键点也是文章/页面的主题和标签。  这个任务涉及的技术点主要有以下几个：">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://i.loli.net/2019/09/10/cO3CQWLiAMSf8rX.png">
+<meta property="og:image" content="https://github.com/chrislinan/cx-extractor-python/raw/master/img/2.png">
+<meta property="og:updated_time" content="2019-09-25T07:19:44.544Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="任意网页正文内容主题词提取">
+<meta name="twitter:description" content="前言网页正文内容主题提取，即任意给一个网页url，通过爬取网页内容和文本分析，得出该网页内容的关键词，作为网页的标签。这些关键词和标签在做流量分析_内容推荐方面有非常重要的意义。比如说我们做数字营销，用过页面来做用户引流，我们就可以知道吸引用户过来的点是什么，用户的潜在需求是什么；另外，针对内容社区的用户画像/推荐系统，关键点也是文章/页面的主题和标签。  这个任务涉及的技术点主要有以下几个：">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/10/cO3CQWLiAMSf8rX.png">
+  <link rel="canonical" href="https://ethaniz.github.io/2019/07/web-topic-extractor/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>任意网页正文内容主题词提取 | 机器学习之道</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">机器学习之道</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Zen of Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-schedule">
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/07/web-topic-extractor/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="异尘">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="机器学习之道">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">任意网页正文内容主题词提取
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              
+                
+              
+
+              <time title="Created: 2019-07-30 17:34:51" itemprop="dateCreated datePublished" datetime="2019-07-30T17:34:51+08:00">2019-07-30</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2019-09-25 15:19:44" itemprop="dateModified" datetime="2019-09-25T15:19:44+08:00">2019-09-25</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/NLP/" itemprop="url" rel="index"><span itemprop="name">NLP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://i.loli.net/2019/09/10/cO3CQWLiAMSf8rX.png" alt="image.png"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>网页正文内容主题提取，即任意给一个网页url，通过爬取网页内容和文本分析，得出该网页内容的关键词，作为网页的标签。这些关键词和标签在做流量分析_内容推荐方面有非常重要的意义。比如说我们做数字营销，用过页面来做用户引流，我们就可以知道吸引用户过来的点是什么，用户的潜在需求是什么；另外，针对内容社区的用户画像/推荐系统，关键点也是文章/页面的主题和标签。 </p>
+<p>这个任务涉及的技术点主要有以下几个： </p>
+<ol>
+<li><strong>网页爬虫</strong>。做网页内容分析，首先得根据url把网页内容扒下来吧。 </li>
+<li><strong>正文提取</strong>。现在的web页面是非常复杂的，除了正文外，包含了大量的广告、导航、信息流等，我们需要去除干扰，只提取网页的正文信息。 </li>
+<li><strong>主题模型</strong> 。拿到正文文本后，就需要做NLP来提取主题关键字了。</li>
+</ol>
+<hr>
+<h2 id="网页爬虫"><a href="#网页爬虫" class="headerlink" title="网页爬虫"></a>网页爬虫</h2><p>这里的网页爬虫和一般的爬虫还不太一样，会简单许多，主要是把原始网页的HTML抓下来即可，主要是为后续的分析挖掘打下基础，属于数据采集的阶段。 </p>
+<p>这里我们采用了Python的<code>requests</code>包。<code>requests</code>相对于Python自带的<code>urllib</code>来说，API更为人性化，鲁棒性也更好。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">r = request.get(url)</span><br><span class="line">r.encoding=<span class="string">'utf-8'</span></span><br><span class="line">html = r.text</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="正文提取"><a href="#正文提取" class="headerlink" title="正文提取"></a>正文提取</h2><p>通过研究爬取下来的原始HTML，我们可以看到是非常负责而且杂乱无章的，充斥着大量的js代码等。我们首先需要解析HTML，尽量过滤掉js代码，留下文本内容。 </p>
+<p>这里我们采用了Python的<code>BeautifulSoup</code>包。这个包堪称Python一大神器，解析HTML效果非常好</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, features=<span class="string">"html.parser"</span>)</span><br><span class="line"><span class="keyword">for</span> script <span class="keyword">in</span> soup([<span class="string">"script"</span>, <span class="string">"style"</span>]):</span><br><span class="line">    script.decompose()</span><br><span class="line">text = soup.get_text()</span><br></pre></td></tr></table></figure>
+
+<p>我们想要的是网页的正文内容，其他的诸如广告或者导航栏等干扰内容需要尽可能的过滤掉。通过<code>BeautifulSoup</code>可以解析出整个HTML的DOM树结构，但是每个网页HTML的写法各不相同，单纯靠HTML解析无法做到通用，因此我们需要跳出HTML的思维，使用其他的方法来提取网页的正文。这里有个很优雅的方式是“基于行块分布函数”的算法<code>cx-extractor</code>。</p>
+<blockquote>
+<p>基于行块分布函数的通用网页正文抽取：线性时间、不建DOM树、与HTML标签无关<br>对于Web信息检索来说，网页正文抽取是后续处理的关键。虽然使用正则表达式可以准确的抽取某一固定格式的页面，但面对形形色色的HTML，使用规则处理难免捉襟见肘。能不能高效、准确的将一个页面的正文抽取出来，并做到在大规模网页范围内通用，这是一个直接关系上层应用的难题。<br><a href="http://weibo.com/cx3180" target="_blank" rel="noopener">作者</a> 提出了 <a href="http://cx-extractor.googlecode.com/files/%E5%9F%BA%E4%BA%8E%E8%A1%8C%E5%9D%97%E5%88%86%E5%B8%83%E5%87%BD%E6%95%B0%E7%9A%84%E9%80%9A%E7%94%A8%E7%BD%91%E9%A1%B5%E6%AD%A3%E6%96%87%E6%8A%BD%E5%8F%96%E7%AE%97%E6%B3%95.pdf" target="_blank" rel="noopener">《基于行块分布函数的通用网页正文抽取算法》</a> ，首次将网页正文抽取问题转化为求页面的行块分布函数，这种方法不用建立Dom树，不被病态HTML所累（事实上与HTML标签完全无关）。通过在线性时间内建立的行块分布函数图，直接准确定位网页正文。同时采用了统计与规则相结合的方法来处理通用性问题。作者相信简单的事情总应该用最简单的办法来解决这一亘古不变的道理。整个算法实现代码不足百行。但量不在多，在法。</p>
+</blockquote>
+<p><img src="https://github.com/chrislinan/cx-extractor-python/raw/master/img/2.png" alt><br>上图就是某个页面求出的行块分布函数曲线。该网页的正文区域为145行至182行，即分布函数图上含有最值且连续的一个区域，这个区域往往含有一个骤升点和一个骤降点，因此，网页正文抽取问题转化为了求行块分布函数上的骤升点和骤降点两个边节点。 这里我们采用了这个算法的Python实现<a href="https://github.com/chrislinan/cx-extractor-python" target="_blank" rel="noopener">GitHub - chrislinan/cx-extractor-python</a>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> CxExtractor <span class="keyword">import</span> CxExtractor</span><br><span class="line">cx = CxExtractor(threshold=<span class="number">40</span>)</span><br><span class="line">text = cx.getText(text)</span><br><span class="line">texts = text.split(<span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="主题模型"><a href="#主题模型" class="headerlink" title="主题模型"></a>主题模型</h2><p>拿到网页正文内容文本后，就需要提取正文主题关键词了。常见做法有3种： </p>
+<ol>
+<li>TFIDF </li>
+<li>Text-Rank </li>
+<li>LSI/LDA </li>
+</ol>
+<p>这里我们先采用TFIDF的方式来做。</p>
+<blockquote>
+<p>TFIDF(Term Frequency Inverse Document Frequency)是一种用于信息检索与数据挖掘的常用加权技术。 词频（TF）=某个词在文本中出现的次数/该文本中总词数 逆向文档频（IDF）=log(语料库中所有文档总数/(包含某词的文档数+1)) 我们通过TF，也就是某个词在文本中出现的频度，来提升这个词在主题中的权重，然后我们通过IDF值，即逆向文档频来降低公共词的主题权重。TF*IDF也就得到了我们要的主题词权重。</p>
+</blockquote>
+<p>做TFIDF，首先步骤是分词。分词的效果取决于词典的构建，且对后续关键词提取影响巨大。首先要基于分析的行业主题建立专用词典，然后还需要维护停用词的词典。有了词典后，我们就可以采用Python分词的神器<code>jieba</code>来处理分词。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jieba</span><br><span class="line">jieba.load_userdict(<span class="string">'./dict.txt'</span>)    <span class="comment">#自定义词典</span></span><br><span class="line">stopwords = set([line.strip() <span class="keyword">for</span> line <span class="keyword">in</span> open(<span class="string">'stopwords.txt'</span>, <span class="string">'r'</span>, encoding=<span class="string">'utf-8'</span>).readlines()])   <span class="comment">#停用词典</span></span><br><span class="line">    </span><br><span class="line">word_lists = []</span><br><span class="line"><span class="keyword">for</span> text <span class="keyword">in</span> texts:</span><br><span class="line">    word_lists += (list(jieba.cut(text, cut_all=<span class="literal">False</span>)))</span><br><span class="line">word_lists = [w <span class="keyword">for</span> w <span class="keyword">in</span> word_lists <span class="keyword">if</span> <span class="keyword">not</span> is_stop_word(w)]</span><br></pre></td></tr></table></figure>
+
+<p>分词完毕后，我们就可以计算TFIDF了。可以通过<code>gensim</code>，<code>scikit-learn</code>等机器学习专用包来做，<code>jieba</code>本身也提供这个功能，这里我们直接用<code>jieba</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jieba.analyse</span><br><span class="line">keywords = jieba.analyse.extract_tags(<span class="string">' '</span>.join(word_lists), topK=<span class="number">20</span>, withWeight=<span class="literal">True</span>, allowPOS=[<span class="string">'n'</span>, <span class="string">'ns'</span>, <span class="string">'nr'</span>, <span class="string">'nt'</span>, <span class="string">'nz'</span>])</span><br></pre></td></tr></table></figure>
+
+<p>注意这里有个参数是<code>allowPOS</code>，按照词性过滤。这个需要根据实际的业务需求来设置。</p>
+<blockquote>
+<p>词性标注(Part-Of-Speech Tagging, POS tagging)，是语料库语言学中将语料库内单词的词性按照其含义和上下文内容进行标记的文本数据处理技术。常见标注示例：<br>n 名词<br>nr 人名<br>ns 地名<br>nt 机构团体<br>nz 其他专名<br>a 形容词<br>v 动词</p>
+</blockquote>
+<hr>
+<h2 id="服务"><a href="#服务" class="headerlink" title="服务"></a>服务</h2><p>到这里，我们的关键词提取就结束了，为了方便其他同学来使用，我们可以用<code>Flask</code>做一个restful api，输入为网址url，输出为提取出的关键词并排序。</p>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在这篇文章里，我们完成了从任意网页url提取正文主题关键词的功能。在主题模型这块采用了常见的TFIDF的算法来解决，可以快速出一个原型提供给业务方使用。后续我们会继续优化，采用更多的算法来进一步提升效果。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Topic-Model/" rel="tag"># Topic Model</a>
+            
+              <a href="/tags/TFIDF/" rel="tag"># TFIDF</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/word2vec/" rel="prev" title="现代NLP的基石 - Word2Vec">
+                  现代NLP的基石 - Word2Vec <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网页爬虫"><span class="nav-number">2.</span> <span class="nav-text">网页爬虫</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正文提取"><span class="nav-number">3.</span> <span class="nav-text">正文提取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主题模型"><span class="nav-number">4.</span> <span class="nav-text">主题模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务"><span class="nav-number">5.</span> <span class="nav-text">服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg"
+      alt="异尘">
+  <p class="site-author-name" itemprop="name">异尘</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.zhihu.com/people/yi-chen-25-73" title="知乎 &rarr; https://www.zhihu.com/people/yi-chen-25-73" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>知乎</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">异尘</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

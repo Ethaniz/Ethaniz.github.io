@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言在前文中，我们采用了一个tf-idf来获取本文的关键词（主题）。由于tf-idf算法仅仅是一个统计模型，简单快速，适合作为baseline。它最大的问题在于单单考虑了词频，而没有考虑语义，并且我们取topK的词，这个K值如何选取，也是一个问题。  本文介绍一种真正的主题模型，也是最早出现的主题模型LSA（Latent Semantic Analysis）：潜在语义分析，它主要是利用SVD降维">
+<meta name="keywords" content="LSA,SVD,Topic Model">
+<meta property="og:type" content="article">
+<meta property="og:title" content="numpy“手撕”文本主题模型之LSA">
+<meta property="og:url" content="https://ethaniz.github.io/2019/09/numpy-lsa/index.html">
+<meta property="og:site_name" content="机器学习之道">
+<meta property="og:description" content="前言在前文中，我们采用了一个tf-idf来获取本文的关键词（主题）。由于tf-idf算法仅仅是一个统计模型，简单快速，适合作为baseline。它最大的问题在于单单考虑了词频，而没有考虑语义，并且我们取topK的词，这个K值如何选取，也是一个问题。  本文介绍一种真正的主题模型，也是最早出现的主题模型LSA（Latent Semantic Analysis）：潜在语义分析，它主要是利用SVD降维">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/f6OZ83u9qxLFsPi.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/sQtcY7TbDElKN3n.png">
+<meta property="og:updated_time" content="2019-09-25T06:39:59.375Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="numpy“手撕”文本主题模型之LSA">
+<meta name="twitter:description" content="前言在前文中，我们采用了一个tf-idf来获取本文的关键词（主题）。由于tf-idf算法仅仅是一个统计模型，简单快速，适合作为baseline。它最大的问题在于单单考虑了词频，而没有考虑语义，并且我们取topK的词，这个K值如何选取，也是一个问题。  本文介绍一种真正的主题模型，也是最早出现的主题模型LSA（Latent Semantic Analysis）：潜在语义分析，它主要是利用SVD降维">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/12/f6OZ83u9qxLFsPi.jpg">
+  <link rel="canonical" href="https://ethaniz.github.io/2019/09/numpy-lsa/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>numpy“手撕”文本主题模型之LSA | 机器学习之道</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">机器学习之道</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Zen of Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-schedule">
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/numpy-lsa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="异尘">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="机器学习之道">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">numpy“手撕”文本主题模型之LSA
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              
+                
+              
+
+              <time title="Created: 2019-09-12 12:06:15" itemprop="dateCreated datePublished" datetime="2019-09-12T12:06:15+08:00">2019-09-12</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2019-09-25 14:39:59" itemprop="dateModified" datetime="2019-09-25T14:39:59+08:00">2019-09-25</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/NLP/" itemprop="url" rel="index"><span itemprop="name">NLP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://i.loli.net/2019/09/12/f6OZ83u9qxLFsPi.jpg" alt></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在前文中，我们采用了一个tf-idf来获取本文的关键词（主题）。由于tf-idf算法仅仅是一个统计模型，简单快速，适合作为baseline。它最大的问题在于单单考虑了词频，而没有考虑语义，并且我们取topK的词，这个K值如何选取，也是一个问题。 </p>
+<p>本文介绍一种真正的主题模型，也是最早出现的主题模型LSA（Latent Semantic Analysis）：潜在语义分析，它主要是利用SVD降维的方式，将词与本文映射到一个新的空间，而这个空间正是以主题作为维度。它的原理非常漂亮，一次奇异值分解就可以得到主题模型，同时也解决了词义的问题。 </p>
+<p>本文继续发挥hands-on的传统，以一个实例来说明LSA的用法。在生产环境中，一般会使用gensim等框架来快速进行开发，本文从scipy和numpy入手，可以更清楚的了解其中的原理。</p>
+<hr>
+<h2 id="数据预处理"><a href="#数据预处理" class="headerlink" title="数据预处理"></a>数据预处理</h2><p>为了演示方便，我们直接采用了scikit-learn中的Newsgroups数据集。这是用于文本分类、文本挖据和信息检索研究的国际标准数据集之一。数据集收集了大约20,000左右的新闻组文档，均匀分为20个不同主题的新闻组集合。 </p>
+<p>我们截取了其中4个主题的数据，并采用scikit-learn中的API来装载。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> fetch_20newsgroups</span><br><span class="line">categories = [<span class="string">'alt.atheism'</span>, <span class="string">'talk.religion.misc'</span>,<span class="string">'comp.graphics'</span>, <span class="string">'sci.space'</span>]</span><br><span class="line">remove = (<span class="string">'headers'</span>, <span class="string">'footers'</span>, <span class="string">'quotes'</span>)</span><br><span class="line">newsgroups_train = fetch_20newsgroups(subset=<span class="string">'train'</span>,categories=categories, remove=remove)</span><br><span class="line">newsgroups_test = fetch_20newsgroups(subset=<span class="string">'test'</span>,categories=categories, remove=remove)</span><br></pre></td></tr></table></figure>
+
+<p>数据下载好后，我们看看里面的文本长啥样</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">newsgroups_train.data[:<span class="number">5</span>]</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">["Hi,\n\n</span></span><br><span class="line"><span class="string">  I've noticed that if you only save a model (withall your mapping planes\n</span></span><br><span class="line"><span class="string">  positioned carefully) to a .3DSfile that when you reload it after restarting\n</span></span><br><span class="line"><span class="string">  3DS, theyare given a default position and orientation.  But if yousave\nto a .PRJ file their positions/orientation arepreserved.  Does anyone\n</span></span><br><span class="line"><span class="string">  know why this information is notstored in the .3DS file?  Nothing is\nexplicitly said inthe manual about saving texture rules in the .PRJ file.\n</span></span><br><span class="line"><span class="string">  I'd like to be able to read the texture rule information,does anyone have \n</span></span><br><span class="line"><span class="string">  the format for the .PRJ file?\n\n</span></span><br><span class="line"><span class="string">  Is the.CEL file format available from somewhere?\n\n</span></span><br><span class="line"><span class="string">  Rych",</span></span><br><span class="line"><span class="string"> '\n\n</span></span><br><span class="line"><span class="string"> Seems to be, barring evidence to the contrary, that Koresh was simply\n</span></span><br><span class="line"><span class="string"> another deranged fanatic who thought it neccessary to take a whole bunch of\n</span></span><br><span class="line"><span class="string"> folks with him, children and all, to satisfy his delusional mania. Jim\n</span></span><br><span class="line"><span class="string"> Jones, circa 1993.\n\n\n</span></span><br><span class="line"><span class="string"> Nope - fruitcakes like Koresh have been demonstrating such evil corruption\n</span></span><br><span class="line"><span class="string"> for centuries.']</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>拿到文本后，第一件事当然是tokenizer，然后采用bag-of-words词袋模型将其向量化。这里使用scikit-learn中的<code>CountVectorizer</code>，以词频计数来作为向量值，当然更精细化可以采用<code>TfidfVectorizer</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> CountVectorizer</span><br><span class="line">vectorizer = CountVectorizer(stop_words=<span class="string">'english'</span>)</span><br><span class="line">vectors = vectorizer.fit_transform(newsgroups_train.data.todense()</span><br><span class="line">vocab = np.array(vectorizer.get_feature_names())</span><br></pre></td></tr></table></figure>
+
+<p>可以看看向量化后的矩阵</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vectors.shape</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">(2034, 26576)</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>这里表示共有2034篇文档，词的vocab_size为26576，将所有文档转成了26576维的向量，每个向量的值为该维表示词的词频。</p>
+<hr>
+<h2 id="SVD分解"><a href="#SVD分解" class="headerlink" title="SVD分解"></a>SVD分解</h2><p>向量化完成后，我们就可以开始奇异值分解了。 <img src="https://i.loli.net/2019/09/12/sQtcY7TbDElKN3n.png" alt></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scipy</span><br><span class="line">U, s, Vh = scipy.linalg.svd(vectors, full_matrices=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<p>根据上图，我们可以看到分解出来的矩阵： </p>
+<ul>
+<li>U: (2034, 2034) 表示2034个样本，对应2034个topic </li>
+<li>s: (2034, ) 表示2034个奇异值，即topic的重要性分数 </li>
+<li>Vh: (2034, 26576) 表示2034个topic，对应26576个vocab，注意这个Vh是公式中的VT，即转置后的V </li>
+</ul>
+<p>SVD奇异值分解，具有以下性质： </p>
+<ul>
+<li>奇异值分解为精确分解，即分解后的矩阵可以完全还原原矩阵，信息不丢失 </li>
+<li>U和Vh是正交矩阵 我们可以在numpy中验证一下：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注意将s从一维向量转换成对角矩阵(diagonal matrix)</span></span><br><span class="line">np.allclose(U.dot(np.diag(s)).dot(Vh), vectors)</span><br><span class="line">np.allclose(U.T.dot(U), np.eye(U.shape[<span class="number">0</span>]))</span><br><span class="line">np.allclose(Vh.dot(Vh.T), np.eye(Vh.shape[<span class="number">0</span>]))</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Topic解读"><a href="#Topic解读" class="headerlink" title="Topic解读"></a>Topic解读</h2><p>LSA的优雅之处，就是把之前的高维文档向量，降维到低维，且这个维度代表了文档的隐含语义，即这个文档的主题topic。svd分解出来的Vh矩阵，即是每个主题的矩阵，维度是每个单词，维度值可以看成是这个主题中每个单词的的重要性。那么，我们可以选取重要性最高的词，来解读某个隐含主题。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">num_top_words = <span class="number">8</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_topics</span><span class="params">(a)</span>:</span></span><br><span class="line">    top_words = <span class="keyword">lambda</span> t: [vocab[i] <span class="keyword">for</span> i <span class="keyword">in</span> np.argsort(t)[:-num_top_words<span class="number">-1</span>:<span class="number">-1</span>]]</span><br><span class="line">    topic_words = ([top_words(t) <span class="keyword">for</span> t <span class="keyword">in</span> a])</span><br><span class="line"><span class="keyword">return</span> [<span class="string">' '</span>.join(t) <span class="keyword">for</span> t <span class="keyword">in</span> topic_words]</span><br><span class="line">show_topics(Vh[:<span class="number">10</span>])</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">['ditto critus propagandist surname galacticentrickindergarten surreal imaginative',</span></span><br><span class="line"><span class="string"> 'jpeg gif file color quality image jfif format',</span></span><br><span class="line"><span class="string"> 'graphics edu pub mail 128 3d ray ftp',</span></span><br><span class="line"><span class="string"> 'jesus god matthew people atheists atheism does graphics',</span></span><br><span class="line"><span class="string"> 'image data processing analysis software available tools display',</span></span><br><span class="line"><span class="string"> 'god atheists atheism religious believe religion argument true',</span></span><br><span class="line"><span class="string"> 'space nasa lunar mars probe moon missions probes',</span></span><br><span class="line"><span class="string"> 'image probe surface lunar mars probes moon orbit',</span></span><br><span class="line"><span class="string"> 'argument fallacy conclusion example true ad argumentum premises',</span></span><br><span class="line"><span class="string"> 'space larson image theory universe physical nasa material']</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看出，有些主题是关于图片格式的，有的是关于邮件协议的，有的是关于太空的。 而svd分解出来的U矩阵，就是每个文档对应的主题矩阵，维度是每个主题，维度值也可以看成是每个主题的重要性。</p>
+<hr>
+<h2 id="Truncated-SVD"><a href="#Truncated-SVD" class="headerlink" title="Truncated SVD"></a>Truncated SVD</h2><p>在生产实践中，普通svd由于要exact decomposition，计算量会非常大，且最后的应用往往会只看前n个topic，因此Truncated SVD的优势在于，预先设置好n的值，可以在牺牲一定精度的条件下，大大减少计算量。这里提供两种常见的svd实现以作参考。 </p>
+<h3 id="sklearn实现"><a href="#sklearn实现" class="headerlink" title="sklearn实现"></a>sklearn实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> decomposition</span><br><span class="line">u, s, v = decomposition.randomized_svd(vectors, <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Facebook实现"><a href="#Facebook实现" class="headerlink" title="Facebook实现"></a>Facebook实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> fbpca</span><br><span class="line">u, s, v = fbpca.pca(vectors, <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>LSA作为最早出现的真正主题模型，非常优雅，同时也存在很多不足，比如它得到的不是一个概率模型，同时得到的向量中含有负值，难以直观解释。针对这些问题，后续就有NMF（非负矩阵分解），LDA（隐含狄利克雷分布）等模型出现。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/LSA/" rel="tag"># LSA</a>
+            
+              <a href="/tags/SVD/" rel="tag"># SVD</a>
+            
+              <a href="/tags/Topic-Model/" rel="tag"># Topic Model</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/neo4j-tutorial/" rel="next" title="手把手教你快速入门知识图谱 - Neo4J教程">
+                  <i class="fa fa-chevron-left"></i> 手把手教你快速入门知识图谱 - Neo4J教程
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/why-start-writting/" rel="prev" title="为什么我要开始写作？">
+                  为什么我要开始写作？ <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据预处理"><span class="nav-number">2.</span> <span class="nav-text">数据预处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SVD分解"><span class="nav-number">3.</span> <span class="nav-text">SVD分解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Topic解读"><span class="nav-number">4.</span> <span class="nav-text">Topic解读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Truncated-SVD"><span class="nav-number">5.</span> <span class="nav-text">Truncated SVD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sklearn实现"><span class="nav-number">5.1.</span> <span class="nav-text">sklearn实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Facebook实现"><span class="nav-number">5.2.</span> <span class="nav-text">Facebook实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg"
+      alt="异尘">
+  <p class="site-author-name" itemprop="name">异尘</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.zhihu.com/people/yi-chen-25-73" title="知乎 &rarr; https://www.zhihu.com/people/yi-chen-25-73" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>知乎</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">异尘</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

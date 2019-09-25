@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。  数据准备为了demo方便">
+<meta name="keywords" content="朴素贝叶斯">
+<meta property="og:type" content="article">
+<meta property="og:title" content="numpy“手撕”朴素贝叶斯">
+<meta property="og:url" content="https://ethaniz.github.io/2019/09/numpy-naive-bayes/index.html">
+<meta property="og:site_name" content="机器学习之道">
+<meta property="og:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。  数据准备为了demo方便">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/NqnoSiWPHYjQtMX.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/csVKXzDdkyUjTCe.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/DFhVYkycGtBMqn1.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/qnkCiwJZOoQ38cN.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/epkhS8ERY1ZojJW.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/IXNefSRnYoDg1lG.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/56NqZVUmjdJwEiR.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/TU54BwvQYNfyH39.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/32Of1FcLKThWBij.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/PvLX4c8B13m2IbJ.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/usVptoylQwMiZGh.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/18/mS8YliHW3fjbyFQ.png">
+<meta property="og:updated_time" content="2019-09-25T07:00:26.986Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="numpy“手撕”朴素贝叶斯">
+<meta name="twitter:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。  数据准备为了demo方便">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg">
+  <link rel="canonical" href="https://ethaniz.github.io/2019/09/numpy-naive-bayes/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>numpy“手撕”朴素贝叶斯 | 机器学习之道</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">机器学习之道</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Zen of Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-schedule">
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/numpy-naive-bayes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="异尘">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="机器学习之道">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">numpy“手撕”朴素贝叶斯
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              
+                
+              
+
+              <time title="Created: 2019-09-18 12:09:53" itemprop="dateCreated datePublished" datetime="2019-09-18T12:09:53+08:00">2019-09-18</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2019-09-25 15:00:26" itemprop="dateModified" datetime="2019-09-25T15:00:26+08:00">2019-09-25</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg" alt><br>常见的python朴素贝叶斯算法的方式，都是使用<code>for循环</code>来统计各个<code>p(特征|类型)</code>的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即<strong>vectorization</strong>。通过各种矩阵运算来去除<code>for循环</code>，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来<strong>手撕</strong>朴素贝叶斯算法，带你领略机器学习中的向量化之道。</p>
+<hr>
+<h2 id="数据准备"><a href="#数据准备" class="headerlink" title="数据准备"></a>数据准备</h2><p>为了demo方便，我们先伪造一些数据。这里伪造的是NLP情感分类的数据。分为两部门<code>train</code>和<code>valid</code>，标签分为1和0，1代表侮辱性文字，0代表正常言论。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">train = [<span class="string">'my dog had flea problems help help please'</span>,</span><br><span class="line">        <span class="string">'mybe not take him to dog park stupid dog'</span>,</span><br><span class="line">        <span class="string">'my dalmation is so cute I love him'</span>,</span><br><span class="line">        <span class="string">'stop posting stupid worthless garbage'</span>,</span><br><span class="line">        <span class="string">'mr licks ate my steak how to stop him'</span>,]</span><br><span class="line">valid = [<span class="string">'my stupid stupid worthless dog'</span>]</span><br><span class="line">label = [<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>]</span><br><span class="line">valid_y = [<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="数据预处理"><a href="#数据预处理" class="headerlink" title="数据预处理"></a>数据预处理</h2><p>NLP的数据预处理主要就是词典的创建和文本的向量化。这里由于是英语文档，不存在分词的问题。 </p>
+<p>这里由于是<strong>手撕</strong>教程，不使用<code>spacy</code>等高阶NLP库，词典创建的也即使用Python的<code>set</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vocab = set([])</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> train:</span><br><span class="line">    vocab = vocab | set(doc.split())</span><br><span class="line">vocabList = list(vocab)</span><br><span class="line"><span class="comment"># 根据词反查index</span></span><br><span class="line">vocabList.index(<span class="string">'please'</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="文档向量化"><a href="#文档向量化" class="headerlink" title="文档向量化"></a>文档向量化</h2><p>向量话的原理，首先将文档中句子的每一个单词按照字典转换为<code>index</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">train_vec = []</span><br><span class="line">valid_vec = []</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> train:</span><br><span class="line">    train_vec.append([vocabList.index(x) <span class="keyword">for</span> x <span class="keyword">in</span> doc.split()])</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> valid:</span><br><span class="line">    valid_vec.append([vocabList.index(x) <span class="keyword">for</span> x <span class="keyword">in</span> doc.split()])</span><br></pre></td></tr></table></figure>
+
+<p>可以看看向量化后的结果</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">train_vec, valid_vec</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">[[28, 11, 16, 7, 26, 19, 19, 8],</span></span><br><span class="line"><span class="string">  [20, 24, 21, 14, 6, 11, 12, 22, 11],</span></span><br><span class="line"><span class="string">  [28, 5, 9, 25, 0, 3, 2, 14],</span></span><br><span class="line"><span class="string">  [1, 17, 22, 15, 13],</span></span><br><span class="line"><span class="string">  [18, 4, 27, 28, 10, 23, 6, 1, 14]],</span></span><br><span class="line"><span class="string"> [[28, 22, 22, 15, 11]]</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>接着是将词典的每一个单词作为一个feature维度处理，将所有文档处理成相同维度的矩阵，维度大小即为词典的长度，而每个维度的值有多种处理方式，比如按照句子中每个单词的<code>Count</code>计数，或者是每个单词的<code>TFIDF</code>值。这里我们采用了<code>Count</code>，为了体现手撕，使用了Python的<code>Counter</code>，为了体现numpy矩阵运算的思路，使用了<code>scipy</code>的稀疏矩阵<code>sparse.csr_matrix</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line"><span class="keyword">from</span> scipy.sparse <span class="keyword">import</span> csr_matrix</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_term_doc_matrix</span><span class="params">(label_list, vocab_len)</span>:</span></span><br><span class="line">    j_indices = []</span><br><span class="line">    indptr = []</span><br><span class="line">    values = []</span><br><span class="line">    indptr.append(<span class="number">0</span>)</span><br><span class="line">    <span class="keyword">for</span> i, doc <span class="keyword">in</span> enumerate(label_list):</span><br><span class="line">        feature_counter = Counter(doc)</span><br><span class="line">        j_indices.extend(feature_counter.keys())</span><br><span class="line">        values.extend(feature_counter.values())</span><br><span class="line">        indptr.append(len(j_indices))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> csr_matrix((values, j_indices, indptr),</span><br><span class="line">                      shape=(len(indptr) - <span class="number">1</span>, vocab_len), dtype=int)</span><br><span class="line">train_matrix = get_term_doc_matrix(train_vec, len(vocabList)</span><br><span class="line">valid_matrix = get_term_doc_matrix(valid_vec, len(vocabList)</span><br></pre></td></tr></table></figure>
+
+<p>可以看看矩阵化后的train和valid，分别转换成了samples*feature，29即为字典的维度。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">train_matrix, valid_matrix</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&lt;5x29 sparse matrix of type ''</span></span><br><span class="line"><span class="string">    with 37 stored elements in Compressed Sparse Row format&gt;,</span></span><br><span class="line"><span class="string"> &lt;1x29 sparse matrix of type ''</span></span><br><span class="line"><span class="string">    with 4 stored elements in Compressed Sparse Row format&gt;</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>我们将生成的<strong>train_matrix</strong>作图如下（为方便观看省去了部分维度） <img src="https://i.loli.net/2019/09/18/NqnoSiWPHYjQtMX.png" alt></p>
+<hr>
+<h2 id="朴素贝叶斯算法原理"><a href="#朴素贝叶斯算法原理" class="headerlink" title="朴素贝叶斯算法原理"></a>朴素贝叶斯算法原理</h2><p>谈到朴素贝叶斯算法，首先想到的必定是著名的贝叶斯公式</p>
+<div align="center">
+    <img width="180" height="50" src="https://i.loli.net/2019/09/18/csVKXzDdkyUjTCe.png">
+</div>
+
+<p>不过这个定理如何体现到我们机器学习的场景呢？我们把其中的A和B换成实际的物理意义如下：</p>
+<div align="center">
+    <img width="260" height="50" src="https://i.loli.net/2019/09/18/DFhVYkycGtBMqn1.png">
+</div>
+
+<p>在我们的分类监督学习中，其实就是求在一定特征的样本情况下，某个具体类别的概率。根据贝叶斯公式，可以转换成分别求某个类别下这些特征的概率、某类别的概率、特征的概率。 </p>
+<p>实际场景中，特征一般是多维的，而多维特征的联合概率是比较复杂的。这时候，就体现出<strong>朴素</strong>的概念了。我们对样本作出假设：样本中的各个特征是相互独立的。这样，可以将联合概率转换成以下的独立概率乘积：</p>
+<div align="center">
+    <img width="400" height="50" src="https://i.loli.net/2019/09/18/qnkCiwJZOoQ38cN.png">
+</div>
+
+<p>当然，这种假设肯定是粗暴的。但是实践过程中，计算量减少带来的益处是远大于粗暴假设带来的失真。这也是最考验算法工程师的地方，既要考虑数学的严谨，同时也要考虑工程实现。“part-science, part-art”，这或许也是机器学习之道。 </p>
+<p>当然，对于模型最终的应用来说，求出具体的概率绝对值是意义不大的。我们只需要知道不同特征之间概率的比值就行。也就是说，对于二分类问题，我们只需要知道：</p>
+<div align="center">
+    <img width="200" height="35" src="https://i.loli.net/2019/09/18/epkhS8ERY1ZojJW.png">
+</div>
+
+<p>就可以判断出该样本是属于类别1。于是，我们可以接着进行公式变换，将<code>P(类别2|特征)</code>移到等式左边，并取<code>log</code>：</p>
+<div align="center">
+    <img width="160" height="50" src="https://i.loli.net/2019/09/18/IXNefSRnYoDg1lG.png">
+</div>
+
+<p>同样，根据<strong>朴素</strong>的假设，可以得到：</p>
+<div align="center">
+    <img width="500" height="50" src="https://i.loli.net/2019/09/18/56NqZVUmjdJwEiR.png">
+</div>
+<div align="center">
+    <img width="550" height="50" src="https://i.loli.net/2019/09/18/TU54BwvQYNfyH39.png">
+</div>
+
+<p>即，我们需要求出每个特征对应的</p>
+<div align="center">
+    <img width="150" height="50" src="https://i.loli.net/2019/09/18/32Of1FcLKThWBij.png">
+</div>
+
+<p>以及每个类别对应的</p>
+<div align="center">
+    <img width="80" height="50" src="https://i.loli.net/2019/09/18/PvLX4c8B13m2IbJ.png">
+</div>
+
+<p>然后全部相加，看结果是否大于0即可判断出样本的类别。而这两块，我们都是可以从训练样本中求出（先验概率），这也就是朴素贝叶斯算法训练的部分。</p>
+<hr>
+<p>##朴素贝叶斯矩阵运算</p>
+<p>前言中说到，一般的教程，直接使用<code>for循环</code>数数一般就可以求出上述的两个log值，完成“训练”。我们这样，要充分应用numpy的矩阵运算特性，不使用<code>for循环</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">p1 = np.squeeze(np.asarray(train_matrix[np.asarray(label==<span class="number">1</span>].sum(<span class="number">0</span>)))</span><br><span class="line">p0 = np.squeeze(np.asarray(train_matrix[np.asarray(label==<span class="number">0</span>].sum(<span class="number">0</span>)))</span><br><span class="line">pr1 = (p1+<span class="number">1</span>) / ((np.asarray(label)==<span class="number">1</span>).sum() + <span class="number">1</span>)</span><br><span class="line">pr0 = (p0+<span class="number">1</span>) / ((np.asarray(label)==<span class="number">0</span>).sum() + <span class="number">1</span>)</span><br><span class="line">r = np.log(pr1/pr0)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2019/09/18/usVptoylQwMiZGh.png" alt><br>还是以这个图为例，<code>pr1</code>即为类别为1的样本中特征x的概率。在NLP中，每个特征都是一个词，其物理意义就是某个词在某个类别中出现的概率，而最后求出的<code>r</code>即为所有特征的概率在2个类别的比值，注意，这里的<code>r</code>是个向量，是通过样本之间的矩阵运算一次性求出。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">r</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">array([-0.40546511,  0.28768207, -0.40546511, -0.40546511,-0.40546511,</span></span><br><span class="line"><span class="string">       -0.40546511,  0.28768207, -0.40546511, -0.40546511, -0.40546511,</span></span><br><span class="line"><span class="string">       -0.40546511,  0.69314718,  0.98082925,  0.98082925, -0.11778304,</span></span><br><span class="line"><span class="string">        0.98082925, -0.40546511,  0.98082925, -0.40546511, -0.81093022,</span></span><br><span class="line"><span class="string">        0.98082925,  0.98082925,  1.38629436, -0.40546511,  0.98082925,</span></span><br><span class="line"><span class="string">       -0.40546511, -0.40546511, -0.40546511, -1.09861229])</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>接下来求第二个log，这个直接就是不同类别的比例。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">b = np.log((np.asarray(label)==<span class="number">1</span>).mean() / (np.asarra(label)==<span class="number">0</span>).mean())</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">-0.4054651081081643</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>r</code>和<code>b</code>即为我们训练出的模型的参数。可以将其序列化到磁盘，供后续预测的时候使用（也就是深度学习中的inference）。</p>
+<hr>
+<h2 id="朴素贝叶斯推理"><a href="#朴素贝叶斯推理" class="headerlink" title="朴素贝叶斯推理"></a>朴素贝叶斯推理</h2><p>由于<code>r</code>代表了训练样本中每一个特征词的在不同类别的概率比值，比如’stupid’等词就很高，而’love’等词就较低。在实际应用中，我们同样取出预测样本中的所有词，然后考虑这些词的概率比值，最后全部相加，即可判断最终样本的类别。同样，我们使用numpy的矩阵运算。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">train_matrix@r + b &gt; <span class="number">0</span></span><br><span class="line"><span class="comment"># array([False,  True, False,  True, False])</span></span><br><span class="line">valid_matrix@r + b &gt; <span class="number">0</span></span><br><span class="line"><span class="comment"># array([ True])</span></span><br></pre></td></tr></table></figure>
+
+<p>这里<code>@</code>是numpy的矩阵乘操作，举例如图<br><img src="https://i.loli.net/2019/09/18/mS8YliHW3fjbyFQ.png" alt><br>而<code>b</code>作为一个标量，会直接触发numpy中的<code>broadcast</code>操作，直接把<code>+</code>应用到所有样本，同样<code>&gt;</code>也会<code>broadcast</code>，最终得到一个array，表示每一个测试样本是否预测为类别1。</p>
+<hr>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><p>由于上面推理过程中，<code>train_matrix</code>和<code>valid_matrix</code>都是由词频组成，相当于在求具体概率比值的时候应用词频做了加权。在实际应用中，也可考虑不使用词频，直接使用是否含有某个特征词，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">train_matrix.sign()@r + b &gt; <span class="number">0</span></span><br><span class="line">valid_matrix.sign()@r + b &gt; <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>具体哪种方式好，还是要根据实际的数据样本情况来具体测试。</p>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文以NLP中的句子情感分析为例，使用numpy的矩阵运算来<strong>手撕</strong>朴素贝叶斯算法，可以加深对与朴素贝叶斯算法的理解，并体会机器学习中矩阵运算之道。 </p>
+<p>朴素贝叶斯简单快捷，特别适合较大规模的稀疏矩阵，在情感分析、垃圾邮件分类等场景中有很普遍的应用。在深度学习大行其道的今天，我们仍然可以通过这个简单的算法来快速搭建整个流程的<strong>pipeline</strong>。在我眼里，在机器学习项目的初期，流程pipeline的重要性大于任何算法。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/朴素贝叶斯/" rel="tag"># 朴素贝叶斯</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/why-start-writting/" rel="next" title="为什么我要开始写作？">
+                  <i class="fa fa-chevron-left"></i> 为什么我要开始写作？
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/return-sequences-keras/" rel="prev" title="Keras中return_sequences和return_state有什么用？">
+                  Keras中return_sequences和return_state有什么用？ <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据准备"><span class="nav-number">1.</span> <span class="nav-text">数据准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据预处理"><span class="nav-number">2.</span> <span class="nav-text">数据预处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文档向量化"><span class="nav-number">3.</span> <span class="nav-text">文档向量化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#朴素贝叶斯算法原理"><span class="nav-number">4.</span> <span class="nav-text">朴素贝叶斯算法原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#朴素贝叶斯推理"><span class="nav-number">5.</span> <span class="nav-text">朴素贝叶斯推理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展"><span class="nav-number">6.</span> <span class="nav-text">扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg"
+      alt="异尘">
+  <p class="site-author-name" itemprop="name">异尘</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.zhihu.com/people/yi-chen-25-73" title="知乎 &rarr; https://www.zhihu.com/people/yi-chen-25-73" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>知乎</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">异尘</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="源起– 说起博客，在大学阶段曾经玩过，当时玩的还是MSN Spaces。不过上面更多是一些经历、感悟，为赋新词强说愁罢了。后来读了研究生、有了家庭、有了事业，个人博客也就逐渐荒废了。现在MSN Spaces早已关闭，之前的文章也就无从寻觅了。工作以后，写作方面更多的是工作记录，以零散笔记为主，主要是用的Evernote以及现在的Bear，但是太过零散不成体系。  无意之中看到了Andrew Ch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么我要开始写作？">
+<meta property="og:url" content="https://ethaniz.github.io/2019/09/why-start-writting/index.html">
+<meta property="og:site_name" content="机器学习之道">
+<meta property="og:description" content="源起– 说起博客，在大学阶段曾经玩过，当时玩的还是MSN Spaces。不过上面更多是一些经历、感悟，为赋新词强说愁罢了。后来读了研究生、有了家庭、有了事业，个人博客也就逐渐荒废了。现在MSN Spaces早已关闭，之前的文章也就无从寻觅了。工作以后，写作方面更多的是工作记录，以零散笔记为主，主要是用的Evernote以及现在的Bear，但是太过零散不成体系。  无意之中看到了Andrew Ch">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://i.loli.net/2019/09/17/yhQbvVqCoIGFWJw.jpg">
+<meta property="og:updated_time" content="2019-09-25T06:18:56.582Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="为什么我要开始写作？">
+<meta name="twitter:description" content="源起– 说起博客，在大学阶段曾经玩过，当时玩的还是MSN Spaces。不过上面更多是一些经历、感悟，为赋新词强说愁罢了。后来读了研究生、有了家庭、有了事业，个人博客也就逐渐荒废了。现在MSN Spaces早已关闭，之前的文章也就无从寻觅了。工作以后，写作方面更多的是工作记录，以零散笔记为主，主要是用的Evernote以及现在的Bear，但是太过零散不成体系。  无意之中看到了Andrew Ch">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/17/yhQbvVqCoIGFWJw.jpg">
+  <link rel="canonical" href="https://ethaniz.github.io/2019/09/why-start-writting/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>为什么我要开始写作？ | 机器学习之道</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">机器学习之道</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Zen of Machine Learning</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-schedule">
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-commonweal">
+      
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>Commonweal 404</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://ethaniz.github.io/2019/09/why-start-writting/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="异尘">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="机器学习之道">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">为什么我要开始写作？
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              
+                
+              
+
+              <time title="Created: 2019-09-17 13:23:58" itemprop="dateCreated datePublished" datetime="2019-09-17T13:23:58+08:00">2019-09-17</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2019-09-25 14:18:56" itemprop="dateModified" datetime="2019-09-25T14:18:56+08:00">2019-09-25</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/感悟/" itemprop="url" rel="index"><span itemprop="name">感悟</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://i.loli.net/2019/09/17/yhQbvVqCoIGFWJw.jpg" alt></p>
+<h2 id="源起"><a href="#源起" class="headerlink" title="源起"></a>源起</h2><p>–</p>
+<p>说起博客，在大学阶段曾经玩过，当时玩的还是<code>MSN Spaces</code>。不过上面更多是一些经历、感悟，为赋新词强说愁罢了。后来读了研究生、有了家庭、有了事业，个人博客也就逐渐荒废了。现在<code>MSN Spaces</code>早已关闭，之前的文章也就无从寻觅了。工作以后，写作方面更多的是工作记录，以零散笔记为主，主要是用的<code>Evernote</code>以及现在的<code>Bear</code>，但是太过零散不成体系。 </p>
+<p>无意之中看到了Andrew Chen的一篇推文，“关于写作的15条推特”，深得我心，也是我为什么想在2019年开始写作的最好诠释。 </p>
+<p>Andrew Chen是在用户增长(User Growth)方面的专家，也曾任<code>Uber</code>的增长VP。以下是他的推文原文，并附上我的思考。</p>
+<hr>
+<h2 id="Andrew-Chen’s-Tweetstorm"><a href="#Andrew-Chen’s-Tweetstorm" class="headerlink" title="Andrew Chen’s Tweetstorm"></a>Andrew Chen’s Tweetstorm</h2><h3 id="Tweet-1"><a href="#Tweet-1" class="headerlink" title="Tweet #1"></a>Tweet #1</h3><blockquote>
+<p>1/ After 10+ years of publishing professional writing at <a href="https://t.co/ddc2F89IIV" target="_blank" rel="noopener">http://andrewchen.co</a> , I have a couple opinions on how to get your stuff read.</p>
+</blockquote>
+<p>在过去十年的工作生涯中，我有着非常多的经历，从<strong>软件工程师</strong>到<strong>Scrum Master</strong>，从<strong>数据分析</strong>到<strong>大数据挖掘</strong>，从<strong>机器学习</strong>到<strong>深度学习</strong>。而这些经历更多的是散落在各处，没有一个地方可以沉淀下来。当我意识到这是个很严重的问题时，我也开启了我自己的个人网站<a href="machinelearningzen.com">machinelearningzen.com</a>的建设，希望能够汇聚我的经历和感悟，并把它们分享出来。</p>
+<h3 id="Tweet-2"><a href="#Tweet-2" class="headerlink" title="Tweet #2"></a>Tweet #2</h3><blockquote>
+<p>2/ Titles are 80% of the work, but you write it as the very last thing. It has to be an compelling opinion or important learning</p>
+</blockquote>
+<p>现在人的生活节奏都非常的快，这也是“<strong>标题党</strong>”横行的客观原因。但是我觉得除了有一个引人入胜的标题外，还是要有能够撑得起这个标题的<strong>干货</strong>内容才行。</p>
+<h3 id="Tweet-3"><a href="#Tweet-3" class="headerlink" title="Tweet #3"></a>Tweet #3</h3><blockquote>
+<p>3/ There’s always room for high-quality thoughts/opinions. Venn diagram of people w/ knowledge and those we can communicate is tiny</p>
+</blockquote>
+<p>这个也应证了“<strong>内容为王</strong>”。现在虽是自媒体时代，但是各种抄袭、伪原创仍然遍地都是。我希望我自己的内容都是自己经过<strong>深度思考</strong>后的输出，而不是东拼西凑。</p>
+<h3 id="Tweet-4"><a href="#Tweet-4" class="headerlink" title="Tweet #4"></a>Tweet #4</h3><blockquote>
+<p>4/ Writing is the most scalable professional networking activity - stay home, don’t go to events/conferences, and just put ideas down</p>
+</blockquote>
+<p>非常赞同，感谢<strong>互联网</strong>和<strong>移动互联网</strong>，我们可以呆在家里或者星巴克，一杯咖啡，就能跟全世界志同道合的朋友交流。</p>
+<h3 id="Tweet-5"><a href="#Tweet-5" class="headerlink" title="Tweet #5"></a>Tweet #5</h3><blockquote>
+<p>5/ Think of your writing on the same timescale as your career. Write on a multi-decade timeframe. This means, don’t just pub on Quora/Medium</p>
+</blockquote>
+<p>写作是一个非常好的把自己的碎片知识<strong>体系化</strong>、<strong>融会贯通</strong>的方式。以十年为单位日积月累，你的知识体系会像参天大树一样。</p>
+<h3 id="Tweet-6"><a href="#Tweet-6" class="headerlink" title="Tweet #6"></a>Tweet #6</h3><blockquote>
+<p>6/ Focus on writing freq over anything else. Schedule it. Don’t worry about building an immediate audience. Focus on the intrinsic.</p>
+</blockquote>
+<p>专注于内容本身，不用担心没有读者。另外，保持写作的<strong>频率</strong>，人都会有“拖延症”，有些事情，一旦开始拖就等于结束了。</p>
+<h3 id="Tweet-7"><a href="#Tweet-7" class="headerlink" title="Tweet #7"></a>Tweet #7</h3><blockquote>
+<p>7/ To develop the habit, put a calendar reminder each Sunday for 2 hours. Forced myself to stare at a blank text box and put something down</p>
+</blockquote>
+<p>养成习惯，必须要有很强的<strong>计划力</strong>和<strong>执行力</strong>。这些能力在工作当中同样重要，需要一辈子的修行。</p>
+<h3 id="Tweet-8"><a href="#Tweet-8" class="headerlink" title="Tweet #8"></a>Tweet #8</h3><blockquote>
+<p>8/ Most of my writing comes from talking/reading deciding I strongly agree or disagree. These opinions become titles. Titles become essays.</p>
+</blockquote>
+<p>保持<strong>阅读</strong>和<strong>交流</strong>非常重要。我的工作生涯的前几年，由于圈子太窄，接触的信息也很少，导致成长非常缓慢。后来注意到这个问题后，开始大量的阅读和交流，自己也开始了突飞猛进。现在，是时候把这些阅读和交流再继续沉淀成文字，给更多的人分享。</p>
+<h3 id="Tweet-9"><a href="#Tweet-9" class="headerlink" title="Tweet #9"></a>Tweet #9</h3><blockquote>
+<p>9/ People are often obsessed with needing to write original ideas. Forget it. You’re a journalist with a day job in the tech industry</p>
+</blockquote>
+<p>不用拘泥于开天辟地，现在的科技领域已经不是个人单打独斗的时代了。学会踩在巨人的肩膀上，你才能看得更远。</p>
+<h3 id="Tweet-10"><a href="#Tweet-10" class="headerlink" title="Tweet #10"></a>Tweet #10</h3><blockquote>
+<p>10/ An email subscriber is worth 100x twitter or LinkedIn followers or whatever other stuff is out there. An email = a real channel</p>
+</blockquote>
+<p><strong>Email 订阅</strong>在国外非常流行，可是在中国一直发展不起来，或许就是人们的使用习惯导致。好在移动互联网时代，<strong>微信公众号</strong>也是一个真正的推送渠道。我也开通了自己的微信公众号，文章和个人网站同步，希望喜欢听我的分享的朋友可以通过这种方式得到最新文章的推送。</p>
+<h3 id="Tweet-11"><a href="#Tweet-11" class="headerlink" title="Tweet #11"></a>Tweet #11</h3><blockquote>
+<p>11/ I started writing while working at a VC. They asked, “Why give away ideas? That’s your edge.” Ironic that VCs blog/tweet all day now ;)</p>
+</blockquote>
+<p>这个也是很多人不愿意写博客分享的原因，害怕自己的idea被别人抄袭。其实写文章分享idea，获得巨大提升的还是自己。</p>
+<h3 id="Tweet-12"><a href="#Tweet-12" class="headerlink" title="Tweet #12"></a>Tweet #12</h3><blockquote>
+<p>12/ Publishing ideas, learnings, opinions, for years &amp; years is a great way to give. And you’ll figure out how to capture value later</p>
+</blockquote>
+<p>年复一年地发表你的想法、学到的知识、观点，你很快就能在分享之后获得其中的价值。虽然我才开始真正的写作，我已经感受到了自己的成长，我会一直把它持续下去。</p>
+<h3 id="Tweet-13"><a href="#Tweet-13" class="headerlink" title="Tweet #13"></a>Tweet #13</h3><blockquote>
+<p>13/ Today I learned that tweetstorms can be way less structured than writing an essay, which makes it much easier ;) This is my first one!</p>
+</blockquote>
+<p>Andrew Chen认为在twitter上写作是另外一种轻松愉快的方式，他把这种方式命名为“<strong>推特风暴</strong>”</p>
+<h3 id="Tweet-14"><a href="#Tweet-14" class="headerlink" title="Tweet #14"></a>Tweet #14</h3><blockquote>
+<p>14/ OK that’s all for now! Thanks for reading :)</p>
+</blockquote>
+<p>:)</p>
+<h3 id="Tweet-15"><a href="#Tweet-15" class="headerlink" title="Tweet #15"></a>Tweet #15</h3><blockquote>
+<p>15/ Bonus: In order of value, Writing &gt; Reading books &gt; Reading reddit &gt; Twitter &gt; FB/Instagram ;)</p>
+</blockquote>
+<p>这个是Andrew认为的价值排序：写作 &gt; 读书 &gt; 读 reddit &gt; Twitter &gt; Facebook/Instagram。当然这是站在个人提升的价值上的，切记，我们的<strong>工作</strong>不等于我们的<strong>生活</strong>。保持自己1～2个爱好，并持续投入成为达人，你的人生会更加美好。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/numpy-lsa/" rel="next" title="numpy“手撕”文本主题模型之LSA">
+                  <i class="fa fa-chevron-left"></i> numpy“手撕”文本主题模型之LSA
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/numpy-naive-bayes/" rel="prev" title="numpy“手撕”朴素贝叶斯">
+                  numpy“手撕”朴素贝叶斯 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#源起"><span class="nav-number">1.</span> <span class="nav-text">源起</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Andrew-Chen’s-Tweetstorm"><span class="nav-number">2.</span> <span class="nav-text">Andrew Chen’s Tweetstorm</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-1"><span class="nav-number">2.1.</span> <span class="nav-text">Tweet #1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-2"><span class="nav-number">2.2.</span> <span class="nav-text">Tweet #2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-3"><span class="nav-number">2.3.</span> <span class="nav-text">Tweet #3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-4"><span class="nav-number">2.4.</span> <span class="nav-text">Tweet #4</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-5"><span class="nav-number">2.5.</span> <span class="nav-text">Tweet #5</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-6"><span class="nav-number">2.6.</span> <span class="nav-text">Tweet #6</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-7"><span class="nav-number">2.7.</span> <span class="nav-text">Tweet #7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-8"><span class="nav-number">2.8.</span> <span class="nav-text">Tweet #8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-9"><span class="nav-number">2.9.</span> <span class="nav-text">Tweet #9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-10"><span class="nav-number">2.10.</span> <span class="nav-text">Tweet #10</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-11"><span class="nav-number">2.11.</span> <span class="nav-text">Tweet #11</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-12"><span class="nav-number">2.12.</span> <span class="nav-text">Tweet #12</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-13"><span class="nav-number">2.13.</span> <span class="nav-text">Tweet #13</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-14"><span class="nav-number">2.14.</span> <span class="nav-text">Tweet #14</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tweet-15"><span class="nav-number">2.15.</span> <span class="nav-text">Tweet #15</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="https://i.loli.net/2019/09/25/KGXIwNR1j3CxSkd.jpg"
+      alt="异尘">
+  <p class="site-author-name" itemprop="name">异尘</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">tags</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.zhihu.com/people/yi-chen-25-73" title="知乎 &rarr; https://www.zhihu.com/people/yi-chen-25-73" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>知乎</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">异尘</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
