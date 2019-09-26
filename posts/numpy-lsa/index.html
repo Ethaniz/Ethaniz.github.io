@@ -17,7 +17,7 @@
 
 <link rel="stylesheet" href="/css/main.css?v=7.4.0">
 
-
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
 
 
@@ -56,7 +56,7 @@
 </script>
 
   <meta name="description" content="前言在前文中，我们采用了一个tf-idf来获取本文的关键词（主题）。由于tf-idf算法仅仅是一个统计模型，简单快速，适合作为baseline。它最大的问题在于单单考虑了词频，而没有考虑语义，并且我们取topK的词，这个K值如何选取，也是一个问题。  本文介绍一种真正的主题模型，也是最早出现的主题模型LSA（Latent Semantic Analysis）：潜在语义分析，它主要是利用SVD降维">
-<meta name="keywords" content="LSA,SVD,Topic Model">
+<meta name="keywords" content="Topic Model,LSA,SVD">
 <meta property="og:type" content="article">
 <meta property="og:title" content="numpy“手撕”文本主题模型之LSA">
 <meta property="og:url" content="https://ethaniz.github.io/posts/numpy-lsa/index.html">
@@ -373,11 +373,11 @@
           
           <div class="post-tags">
             
-              <a href="/tags/LSA/" rel="tag"># LSA</a>
+              <a href="/tags/Topic-Model/" rel="tag"><i class="fa fa-tag"></i> Topic Model</a>
             
-              <a href="/tags/SVD/" rel="tag"># SVD</a>
+              <a href="/tags/LSA/" rel="tag"><i class="fa fa-tag"></i> LSA</a>
             
-              <a href="/tags/Topic-Model/" rel="tag"># Topic Model</a>
+              <a href="/tags/SVD/" rel="tag"><i class="fa fa-tag"></i> SVD</a>
             
           </div>
         
@@ -502,6 +502,17 @@
     
   </nav>
   <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://weibo.com/aifunxyz" title="Weibo &rarr; https://weibo.com/aifunxyz" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+    
       <span class="links-of-author-item">
       
       
