@@ -1,1 +1,1 @@
-welcome to Ethaniz's blog: http://aifun.xyz
+welcome to my blog: http://aifun.xyz
