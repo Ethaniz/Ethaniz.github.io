@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://aifun.xyz/posts/math-in-computer/</loc>
+    
+    <lastmod>2019-09-29T07:02:05.242Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://aifun.xyz/categories/index.html</loc>
     
     <lastmod>2019-09-25T11:29:21.688Z</lastmod>
@@ -72,14 +79,7 @@
   </url>
   
   <url>
-    <loc>http://aifun.xyz/login/index.html</loc>
-    
-    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://aifun.xyz/password-reset/index.html</loc>
+    <loc>http://aifun.xyz/account/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
@@ -93,7 +93,21 @@
   </url>
   
   <url>
+    <loc>http://aifun.xyz/password-reset/index.html</loc>
+    
+    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://aifun.xyz/privacy-policy/index.html</loc>
+    
+    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://aifun.xyz/members/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
@@ -107,20 +121,6 @@
   </url>
   
   <url>
-    <loc>http://aifun.xyz/sample-page/index.html</loc>
-    
-    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://aifun.xyz/account/index.html</loc>
-    
-    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://aifun.xyz/user/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
@@ -128,7 +128,14 @@
   </url>
   
   <url>
-    <loc>http://aifun.xyz/members/index.html</loc>
+    <loc>http://aifun.xyz/sample-page/index.html</loc>
+    
+    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://aifun.xyz/login/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     

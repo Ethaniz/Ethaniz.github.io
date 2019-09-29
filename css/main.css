@@ -1685,7 +1685,7 @@ article:last-child .post-eof {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #a3ffe3;
+  background: #d10511;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2716,4 +2716,7 @@ ul.breadcrumb li + li:last-child {
   .pagination {
     margin: 8px 0 0;
   }
+}
+.posts-expand .post-body img {
+  border: 0px;
 }
