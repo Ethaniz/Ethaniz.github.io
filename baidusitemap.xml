@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://aifun.xyz/posts/math-in-computer/</loc>
+    <loc>http://www.aifun.xyz/posts/math-in-computer/</loc>
     <lastmod>2019-09-29</lastmod>
   </url>  <url>
-    <loc>http://aifun.xyz/posts/nlp-word2vec/</loc>
+    <loc>http://www.aifun.xyz/posts/nlp-word2vec/</loc>
     <lastmod>2019-09-25</lastmod>
   </url>  <url>
-    <loc>http://aifun.xyz/posts/knowledge-graph-neo4j-toturial/</loc>
+    <loc>http://www.aifun.xyz/posts/knowledge-graph-neo4j-toturial/</loc>
     <lastmod>2019-09-25</lastmod>
   </url>  <url>
-    <loc>http://aifun.xyz/posts/numpy-lsa/</loc>
+    <loc>http://www.aifun.xyz/posts/numpy-lsa/</loc>
     <lastmod>2019-09-25</lastmod>
   </url>  <url>
-    <loc>http://aifun.xyz/posts/numpy-naive-bayes/</loc>
+    <loc>http://www.aifun.xyz/posts/numpy-naive-bayes/</loc>
     <lastmod>2019-09-25</lastmod>
   </url>  <url>
-    <loc>http://aifun.xyz/posts/why-start-writting/</loc>
+    <loc>http://www.aifun.xyz/posts/why-start-writting/</loc>
     <lastmod>2019-09-25</lastmod>
   </url>  <url>
-    <loc>http://aifun.xyz/posts/keras-return-sequences-return-state/</loc>
+    <loc>http://www.aifun.xyz/posts/keras-return-sequences-return-state/</loc>
     <lastmod>2019-09-25</lastmod>
   </url>  <url>
-    <loc>http://aifun.xyz/posts/numpy-pca-svd/</loc>
+    <loc>http://www.aifun.xyz/posts/numpy-pca-svd/</loc>
     <lastmod>2019-09-25</lastmod>
   </url>  <url>
-    <loc>http://aifun.xyz/posts/web-topic-extractor/</loc>
+    <loc>http://www.aifun.xyz/posts/web-topic-extractor/</loc>
     <lastmod>2019-09-25</lastmod>
   </url>
 </urlset>

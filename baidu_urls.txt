@@ -1,0 +1,9 @@
+http://www.aifun.xyz/posts/math-in-computer/
+http://www.aifun.xyz/posts/numpy-pca-svd/
+http://www.aifun.xyz/posts/keras-return-sequences-return-state/
+http://www.aifun.xyz/posts/numpy-naive-bayes/
+http://www.aifun.xyz/posts/why-start-writting/
+http://www.aifun.xyz/posts/numpy-lsa/
+http://www.aifun.xyz/posts/knowledge-graph-neo4j-toturial/
+http://www.aifun.xyz/posts/nlp-word2vec/
+http://www.aifun.xyz/posts/web-topic-extractor/
