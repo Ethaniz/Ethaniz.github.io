@@ -79,13 +79,6 @@
   </url>
   
   <url>
-    <loc>http://www.aifun.xyz/logout/index.html</loc>
-    
-    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.aifun.xyz/login/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
@@ -93,7 +86,7 @@
   </url>
   
   <url>
-    <loc>http://www.aifun.xyz/register/index.html</loc>
+    <loc>http://www.aifun.xyz/logout/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
@@ -107,14 +100,14 @@
   </url>
   
   <url>
-    <loc>http://www.aifun.xyz/privacy-policy/index.html</loc>
+    <loc>http://www.aifun.xyz/password-reset/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://www.aifun.xyz/members/index.html</loc>
+    <loc>http://www.aifun.xyz/privacy-policy/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
@@ -135,7 +128,14 @@
   </url>
   
   <url>
-    <loc>http://www.aifun.xyz/password-reset/index.html</loc>
+    <loc>http://www.aifun.xyz/register/index.html</loc>
+    
+    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.aifun.xyz/members/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
