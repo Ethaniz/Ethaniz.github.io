@@ -55,27 +55,31 @@
   };
 </script>
 
-  <meta name="description" content="起源机器学习的各项算法，都可以简单理解为：一个向量vector，经过一个函数f(x)，结果得到另一个向量vector或者标量scalar。输入的这个向量，我们称之为样本sample，向量中的每一个值，代表了样本的每一维特征feature。这个向量一般是浮点数的，即dtype=np.float32。  在NLP的相关领域中，我们的样本往往是一段文本内容，如一个句子、一篇文章等等，我们不能把这些文本">
-<meta name="keywords" content="Word2Vec">
+  <meta name="description" content="前言深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。 实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个">
+<meta name="keywords" content="CNN">
 <meta property="og:type" content="article">
-<meta property="og:title" content="现代NLP的基石 - Word2Vec">
-<meta property="og:url" content="http://www.aifun.xyz/posts/nlp-word2vec/index.html">
+<meta property="og:title" content="如何理解CNN中的平移不变性？">
+<meta property="og:url" content="http://www.aifun.xyz/posts/cnn-shift-invariant/index.html">
 <meta property="og:site_name" content="机器拾趣">
-<meta property="og:description" content="起源机器学习的各项算法，都可以简单理解为：一个向量vector，经过一个函数f(x)，结果得到另一个向量vector或者标量scalar。输入的这个向量，我们称之为样本sample，向量中的每一个值，代表了样本的每一维特征feature。这个向量一般是浮点数的，即dtype=np.float32。  在NLP的相关领域中，我们的样本往往是一段文本内容，如一个句子、一篇文章等等，我们不能把这些文本">
+<meta property="og:description" content="前言深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。 实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://i.loli.net/2019/09/10/cXgEFD47ewZpmoJ.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/10/qfMGJs7cwhdBnU4.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/10/N6Htnv8AJhdp4Og.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/10/5ZANefGBoP9npxh.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/10/4x51QCPY9eBKwbc.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/10/yjgV8NnSTFsY5eO.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/10/PmEfvMoHG8NZQJw.png">
-<meta property="og:updated_time" content="2019-09-25T10:25:14.215Z">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/isQP2H6GKRr54Bk.png">
+<meta property="og:image" content="https://aifun.xyz/wp-content/uploads/2019/10/v2-d000a8dde6f1de5a8276cc9701548bcc_b-1.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/Xx92jHrFVcz4iPO.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/TgjJaU4txWMLR7X.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/qbNZM8yjkTifYcW.gif">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/z7lXOgrk2acHPjN.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/NvjLQByRVrqgiS2.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/UYBDKnAahSXLqfd.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/TgjJaU4txWMLR7X.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/HnGF8fRpoqiZUxg.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/11/1uHMgq7P9DNUT2p.png">
+<meta property="og:updated_time" content="2019-10-15T15:29:17.650Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="现代NLP的基石 - Word2Vec">
-<meta name="twitter:description" content="起源机器学习的各项算法，都可以简单理解为：一个向量vector，经过一个函数f(x)，结果得到另一个向量vector或者标量scalar。输入的这个向量，我们称之为样本sample，向量中的每一个值，代表了样本的每一维特征feature。这个向量一般是浮点数的，即dtype=np.float32。  在NLP的相关领域中，我们的样本往往是一段文本内容，如一个句子、一篇文章等等，我们不能把这些文本">
-<meta name="twitter:image" content="https://i.loli.net/2019/09/10/cXgEFD47ewZpmoJ.png">
-  <link rel="canonical" href="http://www.aifun.xyz/posts/nlp-word2vec/">
+<meta name="twitter:title" content="如何理解CNN中的平移不变性？">
+<meta name="twitter:description" content="前言深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。 实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个">
+<meta name="twitter:image" content="https://i.loli.net/2019/10/11/isQP2H6GKRr54Bk.png">
+  <link rel="canonical" href="http://www.aifun.xyz/posts/cnn-shift-invariant/">
 
 
 <script id="page-configurations">
@@ -89,7 +93,7 @@
   };
 </script>
 
-  <title>现代NLP的基石 - Word2Vec | 机器拾趣</title>
+  <title>如何理解CNN中的平移不变性？ | 机器拾趣</title>
   
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147618128-2"></script>
   <script>
@@ -265,7 +269,7 @@
   
   
   <div class="post-block post">
-    <link itemprop="mainEntityOfPage" href="http://www.aifun.xyz/posts/nlp-word2vec/">
+    <link itemprop="mainEntityOfPage" href="http://www.aifun.xyz/posts/cnn-shift-invariant/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="异尘">
@@ -277,7 +281,7 @@
       <meta itemprop="name" content="机器拾趣">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">现代NLP的基石 - Word2Vec
+        <h2 class="post-title" itemprop="name headline">如何理解CNN中的平移不变性？
 
           
         </h2>
@@ -293,7 +297,7 @@
                 
               
 
-              <time title="创建时间：2019-09-10 15:14:24" itemprop="dateCreated datePublished" datetime="2019-09-10T15:14:24+08:00">2019-09-10</time>
+              <time title="创建时间：2019-10-11 11:24:20" itemprop="dateCreated datePublished" datetime="2019-10-11T11:24:20+08:00">2019-10-11</time>
             </span>
           
             <span class="post-meta-item">
@@ -302,7 +306,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/NLP/" itemprop="url" rel="index"><span itemprop="name">NLP</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Deep-Learning/" itemprop="url" rel="index"><span itemprop="name">Deep Learning</span></a></span>
 
                 
                 
@@ -329,60 +333,77 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><img src="https://i.loli.net/2019/09/10/cXgEFD47ewZpmoJ.png" alt="Zv8mc6ulBIVCneD.png"></p>
-<h2 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h2><p>机器学习的各项算法，都可以简单理解为：一个向量vector，经过一个函数f(x)，结果得到另一个向量vector或者标量scalar。输入的这个向量，我们称之为样本sample，向量中的每一个值，代表了样本的每一维特征feature。这个向量一般是浮点数的，即<code>dtype=np.float32</code>。 </p>
-<p>在NLP的相关领域中，我们的样本往往是一段文本内容，如一个句子、一篇文章等等，我们不能把这些文本直接喂给机器学习模型，而是要先把文本转换成浮点数的向量，即文本的向量化表示。这在NLP领域中是非常基础且重要的阶段，其结果可以用在文档搜索，网页搜索，垃圾邮件过滤，文本主题建模等等方面。</p>
+        <p><img src="https://i.loli.net/2019/10/11/isQP2H6GKRr54Bk.png" alt></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。</p>
+<p>实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个重要性质 - 平移不变性。</p>
 <a id="more"></a>
 
 <hr>
-<h2 id="BOW"><a href="#BOW" class="headerlink" title="BOW"></a>BOW</h2><p>在文本的向量话表示领域中，最早出现的方法是BOW（Bag Of Words），即词袋模型。这个模型利用onehot编码的思想，把每一个词看作是一个维度，然后一个文档或句子就可以表示成一个维度为N的向量，N为语料中词语的个数。每个维度具体的值，可以通过简单计数或者计算TF-IDF值来得出。实际方案可参考<code>Scikit Learn</code>的<code>CountVectorizer</code>和<code>TfidfVectorizer</code>。</p>
+<h2 id="认识大神"><a href="#认识大神" class="headerlink" title="认识大神"></a>认识大神</h2><p>正文之前还是要先拜一拜CNN之父 - Yann LeCun，<code>深度学习三巨头</code>之一、<code>笑傲AI界的男人</code>、<code>拥有中文译名最多的法国人</code>😄</p>
 <div align="center">
-    <img width="300" height="300" src="https://i.loli.net/2019/09/10/qfMGJs7cwhdBnU4.png">
+    <img src="https://aifun.xyz/wp-content/uploads/2019/10/v2-d000a8dde6f1de5a8276cc9701548bcc_b-1.jpg">
 </div>
 
-<p>这种方式简单，但是效果一般，因为它忽略了很多信息，比如在一个句子中词语的顺序。另外，由于每个词语都是独立的维度，词与词之间的距离（相关）都是相等的，这也明显不合理。</p>
 <hr>
-<h2 id="Word2Vec"><a href="#Word2Vec" class="headerlink" title="Word2Vec"></a>Word2Vec</h2><p>Word2vec <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">1301.3781 Efficient Estimation of Word Representations in Vector Space</a>是这个领域非常重要的理念。我认为，Word2Vec是NLP迈向深度学习的基石，通过embedding的方法，让模型能够理解到每个词背后的隐藏含义。 </p>
-<p>Word2Vec认为，每一个词都可以表示为一个密集多维向量（相比BOW中的稀疏向量），且这个向量可以捕捉词与词之间的关联。显然，密集的浮点向量，对于机器学习模型是非常友好的。</p>
+<h2 id="CNN原理简介"><a href="#CNN原理简介" class="headerlink" title="CNN原理简介"></a>CNN原理简介</h2><blockquote>
+<p>卷积神经网络（Convolutional Neural Networks, CNN）是一类包含 <a href="https://baike.baidu.com/item/%E5%8D%B7%E7%A7%AF/9411006" target="_blank" rel="noopener">卷积</a> 计算且具有深度结构的 <a href="https://baike.baidu.com/item/%E5%89%8D%E9%A6%88%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/7580523" target="_blank" rel="noopener">前馈神经网络</a> （Feedforward Neural Networks），是 <a href="https://baike.baidu.com/item/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/3729729" target="_blank" rel="noopener">深度学习</a> （deep learning）的代表算法之一 [1-2]  。卷积神经网络具有 <a href="https://baike.baidu.com/item/%E8%A1%A8%E5%BE%81%E5%AD%A6%E4%B9%A0/2140515" target="_blank" rel="noopener">表征学习</a> （representation learning）能力，能够按其阶层结构对输入信息进行平移不变分类（shift-invariant classification），因此也被称为”平移不变人工神经网络（Shift-Invariant Artificial Neural Networks, SIANN）“</p>
+</blockquote>
+<h3 id="卷积"><a href="#卷积" class="headerlink" title="卷积"></a>卷积</h3><p>首先我们来看什么是<code>卷积</code>。<br>我们将问题简化，假设原始图像像素矩阵如下：</p>
 <div align="center">
-    <img width="300" height="140" src="https://i.loli.net/2019/09/10/N6Htnv8AJhdp4Og.png">
+    <img src="https://i.loli.net/2019/10/11/Xx92jHrFVcz4iPO.png">
 </div>
 
-<p>Word2Vec除了采用密集浮点向量来表示每一个单词外，还能实现一个特殊的功能，把数学运算和文本结合起来，比如著名的“king-man-queen-woman”图如下所示：</p>
+<p>即高度为4，宽度为4，通道数是1。</p>
+<p>假设filter是这样：</p>
 <div align="center">
-    <img width="300" height="300" src="https://i.loli.net/2019/09/10/5ZANefGBoP9npxh.png">
+    <img src="https://i.loli.net/2019/10/11/TgjJaU4txWMLR7X.png">
 </div>
 
-<p>采用Word2Vec表示以后，我们可以通过矩阵运算，得出 king-man = queen-woman的等式，即词语的向量中，包含了king和queen中关于王权的概念，同时也包含了man和woman的男女之别。 </p>
-<p>Word2Vec按照实现算法，可分为两类：</p>
-<h3 id="CBOW"><a href="#CBOW" class="headerlink" title="CBOW"></a>CBOW</h3><p>CBOW(Continuous Bag Of Words)是实现word2vec的算法之一。它在每个词语上构造了一个滑动窗口，即词语的上下文-词周围的那些词。每个词都用一个固定长度的向量来表示，然后就可以根据词周围的词来预测中间那个词。 </p>
-<p>在训练过程中，根据每次的预测情况，使用GradientDesent方法，不断调整周围词的向量，当训练完成以后，每个词都会作为中心词，把周围的词向量进行了调整，而这种调整是统一的，即求出的gradient值会同样作用到每个周围词的词向量中。 </p>
-<p>值得注意的是，在实际操作过程中，周围词的向量会首先通过sum或者concat的方式组合在一起，然后进行预测，在训练过程中，每个epoch计算的次数跟整个文本的词数几乎相等，复杂度大概为O(V)。</p>
+<p>即<code>shape=(2, 2, 1)</code></p>
+<p>我们将filter放在原始图像的<code>左上角</code>，做<strong>卷积</strong>操作（矩阵各个元素相乘，最后相加），结果为<code>1x0+1x0+1x0+1x1=1</code>。</p>
+<p>以此类推，如果我们将filter沿着原始图像从左到右，从上到下，依次<strong>扫描</strong>，每一次扫描都做一次卷积操作，则可以得到一个新的矩阵。</p>
 <div align="center">
-    <img width="300" height="190" src="https://i.loli.net/2019/09/10/4x51QCPY9eBKwbc.png">
-    <img width="400" height="290" src="https://i.loli.net/2019/09/10/yjgV8NnSTFsY5eO.png">
+    <img src="https://i.loli.net/2019/10/11/qbNZM8yjkTifYcW.gif" width="50%">
 </div>
 
-<p>更通俗一点的理解，相当于1个老师对应了K个学生，K个学生（周围词）都会从老师（中心词）那里学习知识，但是老师（中心词）是一视同仁的，教给大家一样的知识。因此，这种方式对于具体某个学生，学习的结果不一定是最好的，但是整个班级的训练过程是效率最高最快的。</p>
-<h3 id="Skip-gram"><a href="#Skip-gram" class="headerlink" title="Skip-gram"></a>Skip-gram</h3><p>Skip-gram是word2vec的另一种实现算法。它跟cbow完全相反，即使用一个词来预测它周围的词。在skip-gram中，会利用对周围词的预测情况，使用GradientDecent来不断的调整中心词的词向量，最终所有文本遍历完以后，也就得到了文本所有词的词向量。 </p>
-<p>可以看出，skip-gram的训练次数是要多于cbow的，因为每个词在作为中心词时，都需要把它周围的词全部预测一次，这样相当于比cbow的方法多进行了K-1次（假设K为窗口大小），因此复杂度为O(KV)。</p>
+<p>还是延续上面的例子，我们将扫描操作简化，<code>no padding, no strides</code>，可以得到：</p>
 <div align="center">
-    <img width="500" height="280" src="https://i.loli.net/2019/09/10/PmEfvMoHG8NZQJw.png">
+    <img src="https://i.loli.net/2019/10/11/z7lXOgrk2acHPjN.png">
 </div>
 
-<p>如图所示，这里的窗口值为2，蓝色的词是输入，窗口内的其他词为输出，这样将一个句子转化为训练样本。 </p>
-<p>在skip-gram当中，每个词都要受到周围词的影响，每个词在作为中心词的时候，都要进行K次的预测、调整，因此，当数据量较少的时候，或者词为生僻词出现次数较少时，这种多次的调整会使得词向量更加的准确。 </p>
-<p>对比上面的老师与学生的比喻，在skip-gram中，每个词作为中心词时，其实是1个学生 对应了K个老师，K个老师（周围词）都会对学生（中心词）进行训练，这样单个学生的能力就会相对扎实一些，但是这种训练方式整个班级的学习时间肯定更长。</p>
-<h3 id="Negative-Sample"><a href="#Negative-Sample" class="headerlink" title="Negative Sample"></a>Negative Sample</h3><p>按照正常的训练逻辑，cbow和skip-gram都是分类模型，分类类别数等于语料中词语的个数。因此模型在最后的softmax层非常巨大，会导致训练的时间非常长，且需要非常大的训练数据来收敛模型和避免over-fitting。 </p>
-<p>举个例子，若有一个包含10000个单词的词汇表，而向量特征为300维，则在最后一层Dense层会有300x10000个权重需要更新。 </p>
-<p>为了解决这个问题，word2vec的作者提出了2个方案： </p>
-<ul>
-<li>Subsampling frequent words：以一定的阈值过滤掉了一些高频词，比如“the”，这样可以在一定程度上减少训练数据的数量。 </li>
-<li>Negative sampling：改变优化目标函数，使得每一个训练样本只更新网络的小部分权重。 </li>
-</ul>
-<p>举个例子，在训练样本(”fox”, “quick”)时，我们的输出（标签）为一个one-hot向量，且代表”quick”的神经元输出为1，代表其他成千上万的词的神经元输出为0。采用了negative sampling后，我们首先随机选取一小部分”negative”词语（比如5个）去更新网络的权重，而”positive”词语依然也会更新网络权重。如果在网络的输出层，以前是300x10000的矩阵，现在只需要更新1+5=6个单词，即300x6个权重，是以前的0.06%。在Tensorflow中，有现成的辅助函数<code>tf.nn.nce_loss()</code>可供使用。而在具体的negative samples的选取上，使用了“unigram distribution”，即更频繁使用的词语更容易被选取。</p>
+<p>学过《信号与系统》的同学肯定能记得老师在课上经常讲的一句话：</p>
+<blockquote>
+<p><strong>时域卷积等于频域相乘</strong><br><strong>时域卷积等于频域相乘</strong><br><strong>时域卷积等于频域相乘</strong></p>
+</blockquote>
+<p>简单来说，CNN中的卷积操作，可以理解为多个不同类型的<code>滤波器</code>的滑动窗口在图像全图<code>滑动</code>，最后得到滤波后的结果。而这多个滤波器不是预先定义的，是网络通过不断的训练<strong>学习</strong>到的。</p>
+<h3 id="MaxPooling"><a href="#MaxPooling" class="headerlink" title="MaxPooling"></a>MaxPooling</h3><p>CNN中还有一个非常重要的操作，叫MaxPooling，中文翻译为<code>最大池化</code>，即取局部接受域中值最大的点。</p>
+<p>这个操作很简单，还是继续上面的例子，我们把得到的结果做一次3x3的MaxPooling，即找出3x3格子里的最大值，即为<code>3</code>。当然通常情况下也是需要做滑动操作的。</p>
 <hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文介绍了Word2Vec的起源及相应实现的2种算法cbow和skip-gram，详细对比了这两种算法的原理、训练方式及优缺点，还介绍了Word2Vec训练时的重要trick: negative sampling。Word2Vec虽然不算深度学习，但是它带来的embedding的概念却是现代NLP乃至深度学习的基石，后续我们会继续介绍由此发展的Doc2Vec、Item2Vec、Anything2Vec。</p>
+<h2 id="平移不变性"><a href="#平移不变性" class="headerlink" title="平移不变性"></a>平移不变性</h2><p>好了，了解了CNN的基本概念，我们可以来看平移不变性了。</p>
+<p>首先解释下<strong>平移不变性</strong> : 假设我们需要做图像识别，判断一张图片里面是猫还是狗：</p>
+<div align="center">
+    <img src="https://i.loli.net/2019/10/11/NvjLQByRVrqgiS2.jpg" width="70%">
+</div>
+
+<p>那么不论这张图片里的猫或狗位于图像的哪个位置（上面还是下面，左边还是右边），我们训练好的神经网络都能够把它识别出来。而CNN恰好就具有这样的性质。</p>
+<p>如何理解呢？</p>
+<p>我们将上面的例子扩展一下，这里有三幅图片</p>
+<p><img src="https://i.loli.net/2019/10/11/UYBDKnAahSXLqfd.png" alt></p>
+<p>这里的三角形分别位于中间，左边和上边。</p>
+<p>我们还是以相同的2x2 filter做卷积</p>
+<div align="center">
+    <img src="https://i.loli.net/2019/10/11/TgjJaU4txWMLR7X.png">
+</div>
+
+<p>可以得到滤波后的结果</p>
+<p><img src="https://i.loli.net/2019/10/11/HnGF8fRpoqiZUxg.png" alt></p>
+<p>然后，再同时做3x3的MaxPooling，结果如何？</p>
+<p><img src="https://i.loli.net/2019/10/11/1uHMgq7P9DNUT2p.png" alt></p>
+<p>可以看到，不管三角形位于何处，最后都能得到相同的结果，而这个结果就是神经网络最后做图像识别的判断依据。</p>
+<p>我们可以说，CNN的平移不变性，很大程度需要归功于MaxPooling，因为它是取的某个区域内的极大值。</p>
+<hr>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>平移、旋转、scaling作为图像识别的三大经典问题，一直都是人们研究的热点。大神Yann LeCun陪伴Hinton三十年磨一剑，最终使用深度学习CNN很好的解决了这些问题，使得跌宕了几十年的深度神经网络重生，最终问鼎世界。</p>
+<p>“深度神经网络既漂亮，又光亮透明”，LeCun说。</p>
 
     </div>
 
@@ -404,7 +425,7 @@
           
           <div class="post-tags">
             
-              <a href="/tags/Word2Vec/" rel="tag"><i class="fa fa-tag"></i> Word2Vec</a>
+              <a href="/tags/CNN/" rel="tag"><i class="fa fa-tag"></i> CNN</a>
             
           </div>
         
@@ -414,8 +435,8 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/posts/web-topic-extractor/" rel="next" title="任意网页正文内容主题词提取">
-                  <i class="fa fa-chevron-left"></i> 任意网页正文内容主题词提取
+                <a href="/posts/math-in-computer/" rel="next" title="计算机眼中的数学，跟你所学的不一样">
+                  <i class="fa fa-chevron-left"></i> 计算机眼中的数学，跟你所学的不一样
                 </a>
               
             </div>
@@ -423,10 +444,6 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
-              
-                <a href="/posts/knowledge-graph-neo4j-toturial/" rel="prev" title="手把手教你快速入门知识图谱 - Neo4J教程">
-                  手把手教你快速入门知识图谱 - Neo4J教程 <i class="fa fa-chevron-right"></i>
-                </a>
               
             </div>
           </div>
@@ -478,7 +495,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#起源"><span class="nav-number">1.</span> <span class="nav-text">起源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BOW"><span class="nav-number">2.</span> <span class="nav-text">BOW</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Word2Vec"><span class="nav-number">3.</span> <span class="nav-text">Word2Vec</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CBOW"><span class="nav-number">3.1.</span> <span class="nav-text">CBOW</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Skip-gram"><span class="nav-number">3.2.</span> <span class="nav-text">Skip-gram</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Negative-Sample"><span class="nav-number">3.3.</span> <span class="nav-text">Negative Sample</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#认识大神"><span class="nav-number">2.</span> <span class="nav-text">认识大神</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CNN原理简介"><span class="nav-number">3.</span> <span class="nav-text">CNN原理简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#卷积"><span class="nav-number">3.1.</span> <span class="nav-text">卷积</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MaxPooling"><span class="nav-number">3.2.</span> <span class="nav-text">MaxPooling</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#平移不变性"><span class="nav-number">4.</span> <span class="nav-text">平移不变性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最后"><span class="nav-number">5.</span> <span class="nav-text">最后</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -677,7 +694,7 @@
       repo: 'ethaniz.github.io',
       owner: 'ethaniz',
       admin: ['ethaniz'],
-      id: '11fe25dea11f152cb30ae386089250c4',
+      id: 'e12adf7b70ebe28f0d9ea92a99a3cc75',
         language: window.navigator.language || window.navigator.userLanguage,
       
       distractionFreeMode: 'true'

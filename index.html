@@ -255,6 +255,98 @@
   
   
   <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://www.aifun.xyz/posts/cnn-shift-invariant/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="异尘">
+      <meta itemprop="description" content="现居成都，多年大数据与机器学习经验，目前任某互联网公司算法专家">
+      <meta itemprop="image" content="https://i.loli.net/2019/09/26/LGwrSnIpZH8UFJM.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="机器拾趣">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+            
+            <a href="/posts/cnn-shift-invariant/" class="post-title-link" itemprop="url">如何理解CNN中的平移不变性？</a>
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-11 11:24:20" itemprop="dateCreated datePublished" datetime="2019-10-11T11:24:20+08:00">2019-10-11</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Deep-Learning/" itemprop="url" rel="index"><span itemprop="name">Deep Learning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="https://i.loli.net/2019/10/11/isQP2H6GKRr54Bk.png" alt></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。</p>
+<p>实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个重要性质 - 平移不变性。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/cnn-shift-invariant/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
     <link itemprop="mainEntityOfPage" href="http://www.aifun.xyz/posts/math-in-computer/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -558,7 +650,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
             
-            <a href="/posts/numpy-naive-bayes/" class="post-title-link" itemprop="url">numpy“手撕”朴素贝叶斯</a>
+            <a href="/posts/numpy-naive-bayes/" class="post-title-link" itemprop="url">不用for循环！教你用numpy“手撕”朴素贝叶斯</a>
           
         </h2>
 
@@ -601,7 +693,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><img src="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg" alt><br>常见的python朴素贝叶斯算法的方式，都是使用<code>for循环</code>来统计各个<code>p(特征|类型)</code>的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即<strong>vectorization</strong>。通过各种矩阵运算来去除<code>for循环</code>，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来<strong>手撕</strong>朴素贝叶斯算法，带你领略机器学习中的向量化之道。</p>
+          <p><img src="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg" alt><br>常见的python朴素贝叶斯算法的方式，都是使用<code>for循环</code>来统计各个<code>p(特征|类型)</code>的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即<strong>vectorization</strong>。通过各种矩阵运算来去除<code>for循环</code>，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来<strong>手撕</strong>朴素贝叶斯算法，带你领略机器学习中的矩阵运算之道。</p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -1150,7 +1242,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1176,7 +1268,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

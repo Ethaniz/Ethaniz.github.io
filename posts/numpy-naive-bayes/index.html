@@ -55,13 +55,13 @@
   };
 </script>
 
-  <meta name="description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。">
+  <meta name="description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的矩阵运算之道。">
 <meta name="keywords" content="朴素贝叶斯">
 <meta property="og:type" content="article">
-<meta property="og:title" content="numpy“手撕”朴素贝叶斯">
+<meta property="og:title" content="不用for循环！教你用numpy“手撕”朴素贝叶斯">
 <meta property="og:url" content="http://www.aifun.xyz/posts/numpy-naive-bayes/index.html">
 <meta property="og:site_name" content="机器拾趣">
-<meta property="og:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。">
+<meta property="og:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的矩阵运算之道。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg">
 <meta property="og:image" content="https://i.loli.net/2019/09/18/NqnoSiWPHYjQtMX.png">
@@ -76,10 +76,10 @@
 <meta property="og:image" content="https://i.loli.net/2019/09/18/PvLX4c8B13m2IbJ.png">
 <meta property="og:image" content="https://i.loli.net/2019/09/18/usVptoylQwMiZGh.png">
 <meta property="og:image" content="https://i.loli.net/2019/09/18/mS8YliHW3fjbyFQ.png">
-<meta property="og:updated_time" content="2019-09-25T10:24:24.694Z">
+<meta property="og:updated_time" content="2019-10-08T01:36:50.795Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="numpy“手撕”朴素贝叶斯">
-<meta name="twitter:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的向量化之道。">
+<meta name="twitter:title" content="不用for循环！教你用numpy“手撕”朴素贝叶斯">
+<meta name="twitter:description" content="常见的python朴素贝叶斯算法的方式，都是使用for循环来统计各个p(特征|类型)的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即vectorization。通过各种矩阵运算来去除for循环，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来手撕朴素贝叶斯算法，带你领略机器学习中的矩阵运算之道。">
 <meta name="twitter:image" content="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg">
   <link rel="canonical" href="http://www.aifun.xyz/posts/numpy-naive-bayes/">
 
@@ -95,7 +95,7 @@
   };
 </script>
 
-  <title>numpy“手撕”朴素贝叶斯 | 机器拾趣</title>
+  <title>不用for循环！教你用numpy“手撕”朴素贝叶斯 | 机器拾趣</title>
   
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147618128-2"></script>
   <script>
@@ -283,7 +283,7 @@
       <meta itemprop="name" content="机器拾趣">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">numpy“手撕”朴素贝叶斯
+        <h2 class="post-title" itemprop="name headline">不用for循环！教你用numpy“手撕”朴素贝叶斯
 
           
         </h2>
@@ -335,7 +335,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><img src="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg" alt><br>常见的python朴素贝叶斯算法的方式，都是使用<code>for循环</code>来统计各个<code>p(特征|类型)</code>的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即<strong>vectorization</strong>。通过各种矩阵运算来去除<code>for循环</code>，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来<strong>手撕</strong>朴素贝叶斯算法，带你领略机器学习中的向量化之道。</p>
+        <p><img src="https://i.loli.net/2019/09/18/vgAqxbaSZYLtB7h.jpg" alt><br>常见的python朴素贝叶斯算法的方式，都是使用<code>for循环</code>来统计各个<code>p(特征|类型)</code>的值。其实机器学习除了常规算法思路外，很关键且很优雅的地方在于矩阵化（向量化），即<strong>vectorization</strong>。通过各种矩阵运算来去除<code>for循环</code>，是目前机器学习、深度学习中非常关键的技巧。文本不使用各种高阶机器学习库，单纯使用numpy来<strong>手撕</strong>朴素贝叶斯算法，带你领略机器学习中的矩阵运算之道。</p>
 <a id="more"></a>
 
 <hr>
@@ -546,7 +546,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -572,7 +572,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

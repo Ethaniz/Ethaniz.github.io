@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://www.aifun.xyz/posts/cnn-shift-invariant/</loc>
+    <lastmod>2019-10-15</lastmod>
+  </url>  <url>
+    <loc>http://www.aifun.xyz/posts/numpy-naive-bayes/</loc>
+    <lastmod>2019-10-08</lastmod>
+  </url>  <url>
     <loc>http://www.aifun.xyz/posts/math-in-computer/</loc>
     <lastmod>2019-09-29</lastmod>
   </url>  <url>
@@ -11,9 +17,6 @@
     <lastmod>2019-09-25</lastmod>
   </url>  <url>
     <loc>http://www.aifun.xyz/posts/numpy-lsa/</loc>
-    <lastmod>2019-09-25</lastmod>
-  </url>  <url>
-    <loc>http://www.aifun.xyz/posts/numpy-naive-bayes/</loc>
     <lastmod>2019-09-25</lastmod>
   </url>  <url>
     <loc>http://www.aifun.xyz/posts/why-start-writting/</loc>
