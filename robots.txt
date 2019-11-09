@@ -11,5 +11,5 @@ Disallow: /fonts/
 Disallow: /vendors/
 Disallow: /fancybox/
 
-Sitemap: http://aifun.xyz/sitemap.xml
-Sitemap: http://aifun.xyz/baidusitemap.xml
+Sitemap: https://aifun.xyz/sitemap.xml
+Sitemap: https://aifun.xyz/baidusitemap.xml
