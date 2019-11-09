@@ -73,9 +73,9 @@
         <category>NLP</category>
       </categories>
       <tags>
-        <tag>Topic Model</tag>
         <tag>LSA</tag>
         <tag>SVD</tag>
+        <tag>Topic Model</tag>
       </tags>
   </entry>
   <entry>
@@ -108,8 +108,8 @@
         <category>NLP</category>
       </categories>
       <tags>
-        <tag>TFIDF</tag>
         <tag>Topic Model</tag>
+        <tag>TFIDF</tag>
       </tags>
   </entry>
 </search>
