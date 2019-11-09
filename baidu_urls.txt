@@ -1,3 +1,4 @@
+http://www.aifun.xyz/posts/deep-learning-in-recommendation-system/
 http://www.aifun.xyz/posts/cnn-shift-invariant/
 http://www.aifun.xyz/posts/math-in-computer/
 http://www.aifun.xyz/posts/numpy-pca-svd/

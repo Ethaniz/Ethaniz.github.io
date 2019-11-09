@@ -55,13 +55,13 @@
   };
 </script>
 
-  <meta name="description" content="前言深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。 实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个">
+  <meta name="description" content="前言深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。">
 <meta name="keywords" content="CNN">
 <meta property="og:type" content="article">
 <meta property="og:title" content="如何理解CNN中的平移不变性？">
 <meta property="og:url" content="http://www.aifun.xyz/posts/cnn-shift-invariant/index.html">
 <meta property="og:site_name" content="机器拾趣">
-<meta property="og:description" content="前言深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。 实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个">
+<meta property="og:description" content="前言深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://i.loli.net/2019/10/11/isQP2H6GKRr54Bk.png">
 <meta property="og:image" content="https://aifun.xyz/wp-content/uploads/2019/10/v2-d000a8dde6f1de5a8276cc9701548bcc_b-1.jpg">
@@ -74,10 +74,10 @@
 <meta property="og:image" content="https://i.loli.net/2019/10/11/TgjJaU4txWMLR7X.png">
 <meta property="og:image" content="https://i.loli.net/2019/10/11/HnGF8fRpoqiZUxg.png">
 <meta property="og:image" content="https://i.loli.net/2019/10/11/1uHMgq7P9DNUT2p.png">
-<meta property="og:updated_time" content="2019-10-15T15:29:17.650Z">
+<meta property="og:updated_time" content="2019-11-09T07:50:34.711Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何理解CNN中的平移不变性？">
-<meta name="twitter:description" content="前言深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。 实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个">
+<meta name="twitter:description" content="前言深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。">
 <meta name="twitter:image" content="https://i.loli.net/2019/10/11/isQP2H6GKRr54Bk.png">
   <link rel="canonical" href="http://www.aifun.xyz/posts/cnn-shift-invariant/">
 
@@ -335,9 +335,9 @@
       
         <p><img src="https://i.loli.net/2019/10/11/isQP2H6GKRr54Bk.png" alt></p>
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>深度学习在近两年大红大紫，主要功臣莫过于在计算机视觉computer vision领域的突破。而这里面，深度学习相对传统方式的最大优势，是通过神经网络结构实现特征的自动提取：直接把原始图像像素点输入，网络可以自动提取出有利于判断的特征。</p>
-<p>实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个重要性质 - 平移不变性。</p>
 <a id="more"></a>
 
+<p>实现这一切的关键，就是CNN（Convolutional Neural Networks）卷积神经网络。今天我们不展开来讲CNN，而是去理解CNN里面的一个重要性质 - 平移不变性。</p>
 <hr>
 <h2 id="认识大神"><a href="#认识大神" class="headerlink" title="认识大神"></a>认识大神</h2><p>正文之前还是要先拜一拜CNN之父 - Yann LeCun，<code>深度学习三巨头</code>之一、<code>笑傲AI界的男人</code>、<code>拥有中文译名最多的法国人</code>😄</p>
 <div align="center">
@@ -445,6 +445,10 @@
 
             <div class="post-nav-prev post-nav-item">
               
+                <a href="/posts/deep-learning-in-recommendation-system/" rel="prev" title="且看他深度学习兵分三路，直指推荐系统">
+                  且看他深度学习兵分三路，直指推荐系统 <i class="fa fa-chevron-right"></i>
+                </a>
+              
             </div>
           </div>
         
@@ -513,7 +517,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -526,7 +530,7 @@
             <a href="/categories/">
           
         
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -539,7 +543,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="起源自互联网兴起以来，人们逐渐从信息匮乏走向了信息过载的时代。从成千上万的网页、新闻，到各种音乐、视频，如何样从如此繁多的信息中找到我们想要的，就成了互联网时代的一个非常重要的课题。 以Yahoo为代表的分类目录网站，首先给出了解决方案。他们将网站信息系统地分类整理，人们可以根据需求逐级浏览。但是，这种方案只能覆盖少量的热门网站。 紧接着，以Google为代表搜索引擎，在对信息进行组织和处理后，">
+<meta name="keywords" content="Attention,DIN,DQN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="且看他深度学习兵分三路，直指推荐系统">
+<meta property="og:url" content="http://www.aifun.xyz/posts/deep-learning-in-recommendation-system/index.html">
+<meta property="og:site_name" content="机器拾趣">
+<meta property="og:description" content="起源自互联网兴起以来，人们逐渐从信息匮乏走向了信息过载的时代。从成千上万的网页、新闻，到各种音乐、视频，如何样从如此繁多的信息中找到我们想要的，就成了互联网时代的一个非常重要的课题。 以Yahoo为代表的分类目录网站，首先给出了解决方案。他们将网站信息系统地分类整理，人们可以根据需求逐级浏览。但是，这种方案只能覆盖少量的热门网站。 紧接着，以Google为代表搜索引擎，在对信息进行组织和处理后，">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i.loli.net/2019/11/09/Vu8tGDnlhrX5pT7.png">
+<meta property="og:image" content="https://i.loli.net/2019/11/09/c1weaChP7kLDI6r.png">
+<meta property="og:image" content="https://i.loli.net/2019/11/09/TV5WqM8tHuLsQyb.png">
+<meta property="og:image" content="https://i.loli.net/2019/11/09/SctP7uzmHXrhjMU.png">
+<meta property="og:image" content="https://i.loli.net/2019/11/09/BF7UyYmOEstWr86.png">
+<meta property="og:image" content="https://i.loli.net/2019/11/09/IPz4yex73lEaA2T.png">
+<meta property="og:image" content="https://i.loli.net/2019/11/09/jxvapIQ8wKohU4A.png">
+<meta property="og:image" content="https://i.loli.net/2019/11/09/mV6tpSKxREPHhcy.png">
+<meta property="og:updated_time" content="2019-11-09T07:48:27.844Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="且看他深度学习兵分三路，直指推荐系统">
+<meta name="twitter:description" content="起源自互联网兴起以来，人们逐渐从信息匮乏走向了信息过载的时代。从成千上万的网页、新闻，到各种音乐、视频，如何样从如此繁多的信息中找到我们想要的，就成了互联网时代的一个非常重要的课题。 以Yahoo为代表的分类目录网站，首先给出了解决方案。他们将网站信息系统地分类整理，人们可以根据需求逐级浏览。但是，这种方案只能覆盖少量的热门网站。 紧接着，以Google为代表搜索引擎，在对信息进行组织和处理后，">
+<meta name="twitter:image" content="https://i.loli.net/2019/11/09/Vu8tGDnlhrX5pT7.png">
+  <link rel="canonical" href="http://www.aifun.xyz/posts/deep-learning-in-recommendation-system/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>且看他深度学习兵分三路，直指推荐系统 | 机器拾趣</title>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147618128-2"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !true) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147618128-2');
+    }
+  </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">机器拾趣</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">冰冷机器如何理解世事无常</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://www.aifun.xyz/posts/deep-learning-in-recommendation-system/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="异尘">
+      <meta itemprop="description" content="现居成都，多年大数据与机器学习经验，目前任某互联网公司算法专家">
+      <meta itemprop="image" content="https://i.loli.net/2019/09/26/LGwrSnIpZH8UFJM.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="机器拾趣">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">且看他深度学习兵分三路，直指推荐系统
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-25 14:40:56" itemprop="dateCreated datePublished" datetime="2019-10-25T14:40:56+08:00">2019-10-25</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Recommendation-System/" itemprop="url" rel="index"><span itemprop="name">Recommendation System</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://i.loli.net/2019/11/09/Vu8tGDnlhrX5pT7.png" alt></p>
+<h2 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h2><p>自互联网兴起以来，人们逐渐从信息匮乏走向了<em>信息过载</em>的时代。从成千上万的网页、新闻，到各种音乐、视频，如何样从如此繁多的信息中找到我们想要的，就成了互联网时代的一个非常重要的课题。</p>
+<p>以Yahoo为代表的分类目录网站，首先给出了解决方案。他们将网站信息系统地<em>分类</em>整理，人们可以根据需求逐级浏览。但是，这种方案只能覆盖少量的热门网站。</p>
+<p>紧接着，以Google为代表搜索引擎，在对信息进行组织和处理后，为用户提供了<em>检索</em>服务，解决了长尾需求的问题。但是，如果用户无法找到准确需求的描述呢？比如说，我今天想看一部电影，哪个电影好看，我也不知道。这种场景下，搜索引擎也解决不了。</p>
+<p>这时，以Amazon为代表的公司开始了推荐系统的研究。从用户行为中找到用户的个性化需求，再将信息准确的推荐给需要它的用户。作为一个桥梁，帮助用户发现对自己有价值的信息，让信息能够展现在对它感兴趣的用户面前，这就是推荐系统的使命。</p>
+<p>推荐系统是一个非常庞大的话题。今天我们不展开来讲。我们今天的话题是在当前学术界和工业界，伴随着深度学习在计算机视觉领域和自然语言处理领域的攻城拔寨，他如何去攻占下一个目标 – 推荐系统（更准确的说 – 推荐算法）？</p>
+<h2 id="主流"><a href="#主流" class="headerlink" title="主流"></a>主流</h2><p>大数据技术和AI算法是当今推荐系统的基础。通过大数据平台，可以实现对海量用户行为的准确采集和存储；通过数据挖掘算法，可以通过用户行为挖掘分析用户的个性与偏好，形成现实世界用户的数学建模 – 用户画像；通过NLP及音频/视频理解算法，可以形成准确描述物品的物品画像。在这些基础之上，形成了当前工业界主流的推荐系统架构。以视频推荐的场景为例，如下图 ：</p>
+<p><img src="https://i.loli.net/2019/11/09/c1weaChP7kLDI6r.png" alt></p>
+<p>抛开工程方面的系统架构，单独来看推荐算法相关，可以分为两个部分：<em>召回算法</em>和<em>排序算法</em>。</p>
+<p>召回算法的作用，是从百万级的视频库里，通过一些相对简单粗暴的算法，快速筛选用户可能感兴趣的视频，把物品量级降到数百个，这么做的目的主要是从节省计算成本的角度考虑。常用的召回算法举例：</p>
+<ul>
+<li>基于用户画像的算法</li>
+<li>基于内容相似度的算法</li>
+<li>协同过滤算法</li>
+</ul>
+<p>当然，还可以在召回阶段，根据运营人员的人工经验，进行人为的视频召回。</p>
+<p>由于在召回阶段把物品的量级降到了百级，那么就可以通过排序算法来做精细化处理了。排序算法的目的，就是在这召回的几百个视频里，根据用户的点击率预估、观看时长预估等目标，把这些视频按照得分来排序。排在最前面的，就是用户最喜欢或者最有可能去看的，在推荐的时候，就优先展示出来。这一块由于计算压力相对较小，是各种算法大放异彩的时候。从经典的逻辑回归LR、到Facebook的Xgboost+LR、再到Google一鸣惊人的Wide &amp; Deep、乃至后面的DeepFM、DCN等等，也是深度学习预先攻占的领地。</p>
+<p>再此以后，深度学习如何继续深入推荐系统领域，去取得在计算机视觉、NLP类似的“吊打传统”的成就呢？</p>
+<h2 id="兵分三路"><a href="#兵分三路" class="headerlink" title="兵分三路"></a>兵分三路</h2><h3 id="注意力机制"><a href="#注意力机制" class="headerlink" title="注意力机制"></a>注意力机制</h3><p>Attention，中文翻译为注意力机制，源自于NLP的<em>机器翻译</em>领域。</p>
+<p><img src="https://i.loli.net/2019/11/09/TV5WqM8tHuLsQyb.png" alt></p>
+<p>上图为机器翻译中的典型场景 – Sequence to Sequence，主流做法是用Encoder – Decoder的架构来做。当人类需要把”How are you”这句英语翻译成中文时，我们并不是一个单词一个单词的翻译，而是翻译的过程中不断参考上下文，不同的上下文，对于当前翻译的文字作用不同，在数学里面，就是权重不同。</p>
+<p>2017年，Google的论文《Attention is All You Need》横空出世，以Attention为主要结构的Transformer，结束了NLP领域中RNN的统治，再次基础上各种NLP模型如Bert等，也不断刷新着NLP领域的记录。同样，在语音和视频等有连续序列的场景中，Attention也是各种广泛应用，人们纷纷说：真香。</p>
+<p>那么推荐系统呢？其实推荐系统也是典型的序列场景。以网络购物为例，一个用户在半年之内购买的商品，就是一个序列。根据之前的序列，预测他之后会买的商品，就是推荐。因此，在推荐系统中应用Attention，再自然不过。</p>
+<p>来自阿里妈妈的盖坤团队，就是这么做的。他们提出了DIN – Deep Interest Network。</p>
+<p><img src="https://i.loli.net/2019/11/09/SctP7uzmHXrhjMU.png" alt></p>
+<p>他们认为，用户的兴趣是非常多样的，而当前的候选商品，仅仅只是跟用户的一部分兴趣有关。在考虑排序的时候，针对每一个候选商品，分别计算用户以往购买物品的Attention权重，然后把历史记录通过Attention权重计算embedding。</p>
+<p>比如上图中，一位女士购买过鞋、包、外套、杯子等，且外套买了很多，当她购买新的冬季外套时，这个兴趣只跟她之前买过的冬季外套相关，跟她买过的鞋、包、杯子等行为无关。通过Attention来使得当前候选物品<em>局部激活</em>历史兴趣，实现Local Activation，同时，权重的多样性也能实现用户兴趣多样性的表达。</p>
+<h3 id="图神经网络"><a href="#图神经网络" class="headerlink" title="图神经网络"></a>图神经网络</h3><p>如果说注意力机制是深度学习在推荐系统中的正常发展的话，基于知识图谱的图神经网络，就是一路奇兵了。</p>
+<p>知识谱图，Knowledge Graph，即大规模语义网络。它把现实世界抽象成一张网络，其中富含<em>实体</em>（entity）、<em>概念</em>（concept）、及其之间的各种语义<em>关系</em>（relationship）。</p>
+<p><img src="https://i.loli.net/2019/11/09/BF7UyYmOEstWr86.png" alt></p>
+<p>知识图谱早在20世纪60年代就开始有人研究，当时称为知识工程，是符号主义的主要观点（深度学习代表着连接主义）。2012年，Google收购了Metaweb公司，正式发布了知识图谱，主要应用于搜索领域。典型的应用场景，你在搜索框里搜“姚明的身高”，回复的答案直接是229cm，而不是以往的文本字符串匹配。</p>
+<p>知识图谱代表着认知智能，它使得AI可以理解到具体文本背后代表的知识。比如用户喜欢C罗，那么我们就可以推理出用户喜欢足球，那么给用户推荐皇马的比赛、世界杯葡萄牙队的比赛就最自然不过了。</p>
+<p>深度学习攻占知识谱图领域的姿势，是“图表示学习”（Graph Representation Learning），即图神经网络。通过图表示学习，将知识图谱中的节点、边等都表示为特征向量，这些向量都蕴含着节点间的知识信息，然后各种知识的推理过程，就可以通过数学的矩阵运算来得到。</p>
+<p>那么，深度学习通过图神经网络来做推荐系统，同样水到渠成。</p>
+<p><img src="https://i.loli.net/2019/11/09/IPz4yex73lEaA2T.png" alt></p>
+<p>我们以新闻推荐为例。当用户看过一堆新闻后，首先通过NLP技术识别出新闻中的实体，如Trump、Tim Cook等，然后根据已有的知识图谱，可以得到这些实体附近“一跳”（甚至多跳）的实体，通过图嵌入（Graph Embedding）得到这些这些实体的特征向量。有了这些向量，不管是通过传统的向量相似度、还是作为一个特征放到排序算法中，就有很多方式来做推荐了。</p>
+<p>知识图谱是我认为目前非常有潜力的一个方向，它代表着AI从感知智能向认知智能的发展，同时，它非常好的解决了当前机器学习解释性弱的问题。</p>
+<h3 id="强化学习"><a href="#强化学习" class="headerlink" title="强化学习"></a>强化学习</h3><p>推荐系统一直存在一个痛点，即EE问题（Explore &amp; Exploit）。<br>Explore即探索，指在未知的特征空间的采样；Exploit即利用，指利用探索的结果更有效的预测。</p>
+<p>举个例子，通常的推荐算法是基于用户的历史行为的。你经常听周杰伦的歌，我就给你推周杰伦，或者类似港台的流行歌曲。久而久之，用户会进入到“信息茧房”之中，永远都是听类似的，没有“惊喜”，这就是Exploit；而为了解决这个问题，我们必须进行Explore以提升推荐系统的多样性，去尝试推荐一些用户没有听过的歌，虽然这些歌用户可能会不喜欢。</p>
+<p>在机器学习中，这是做不到的。机器学习的根基是基于已有样本的归纳和拟合，而对于未知特征空间，我们是无法采样并构造训练集的。</p>
+<p>传统推荐系统中，有人在尝试Bandit算法，即多臂老虎机问题（MAB，Multi-armed bandit problem）。而这个算法，就是当前大热的<em>强化学习</em>的简化版。</p>
+<p>强化学习，即Reinforcement Learning，又称为增强学习。这是区别于常见的监督学习、无监督学习之外的，另一条强劲的AI分支。大家应该都知道Google的AlphaGo大战李世石、柯洁，这背后强化学习功不可没。</p>
+<p><img src="https://i.loli.net/2019/11/09/jxvapIQ8wKohU4A.png" alt></p>
+<p>强化学习的中心思想，就是让智能体（Agent）在环境（Environment）里面学习。每个行动（Action）都会对应各自的奖励（reward），智能体通过分析数据来学习，怎样的情况下应该做怎样的事情。这种方式是非常自然的，比如有个小孩子，第一次看到了火，走到火边感受到了火的温暖，他知道火是个好东西（reward+1），当他尝试去摸火时，又被火烫到（reward-1）。最后他得出了结论，离火稍远一点就行，不能接近。AI通过强化学习，跟人类自身去学习大自然是及其相似的。</p>
+<p>传统的强化学习代表算法包括Q-Learning等，在深度学习时代，通过深度神经网络来近似Q值，提出了Deep Q-Learning等。</p>
+<p>同样以新闻推荐的场景举例：</p>
+<p><img src="https://i.loli.net/2019/11/09/mV6tpSKxREPHhcy.png" alt></p>
+<p>用户和新闻构成了环境， 推荐算法是<em>智能体</em>。当智能体收到一个新闻请求后，先根据用户特征和新闻特征，随机推荐K个新闻。用户通过点击或不点击来作为<em>反馈</em>，而推荐算法可以实时或者定时，根据每个推荐及反馈，来更新策略，最终使得算法点击率达到最优。</p>
+<p>通过深度强化学习，可以不断的进行Explore探索，并采用不断优化的方式来Exploit，实现准确性和多样性的平衡，一定程度上解决了EE问题；另外，它还能解决推荐系统<em>冷启动</em>的问题，即当系统刚上线，或者新用户到来，没有那么多的数据来进行传统的监督学习，那么通过强化学习来实现过程中的逐步优化，就是很好的方式了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文对推荐系统的起源、概念、以及主流的推荐架构进行了介绍，重点分享了在深度学习时代，学术界及工业界去做推荐算法的新思路。正如最近加入阿里的贾扬清大神所说，如果深度学习攻破了当前占据了当前互联网大多数资源和算力的推荐系统、广告领域，就像它在计算机视觉取得的成就一样，那么带来的价值将会是非常巨大的。我相信，这只是时间问题。</p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="异尘 wechat" style="width: 200px; max-width: 100%;">
+  <div>欢迎您扫一扫上面的微信公众号，订阅我的博客</div>
+</div>
+
+      
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Attention/" rel="tag"><i class="fa fa-tag"></i> Attention</a>
+            
+              <a href="/tags/DIN/" rel="tag"><i class="fa fa-tag"></i> DIN</a>
+            
+              <a href="/tags/DQN/" rel="tag"><i class="fa fa-tag"></i> DQN</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/posts/cnn-shift-invariant/" rel="next" title="如何理解CNN中的平移不变性？">
+                  <i class="fa fa-chevron-left"></i> 如何理解CNN中的平移不变性？
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#起源"><span class="nav-number">1.</span> <span class="nav-text">起源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主流"><span class="nav-number">2.</span> <span class="nav-text">主流</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#兵分三路"><span class="nav-number">3.</span> <span class="nav-text">兵分三路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注意力机制"><span class="nav-number">3.1.</span> <span class="nav-text">注意力机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图神经网络"><span class="nav-number">3.2.</span> <span class="nav-text">图神经网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#强化学习"><span class="nav-number">3.3.</span> <span class="nav-text">强化学习</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="https://i.loli.net/2019/09/26/LGwrSnIpZH8UFJM.jpg"
+      alt="异尘">
+  <p class="site-author-name" itemprop="name">异尘</p>
+  <div class="site-description" itemprop="description">现居成都，多年大数据与机器学习经验，目前任某互联网公司算法专家</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://weibo.com/aifunxyz" title="Weibo &rarr; https://weibo.com/aifunxyz" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.zhihu.com/people/yi-chen-25-73" title="知乎 &rarr; https://www.zhihu.com/people/yi-chen-25-73" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>知乎</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-laptop"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">异尘</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'cb5f02dcae7fb041a28a',
+      clientSecret: 'af1050d07337b233d629af013bda2856c23932a5',
+      repo: 'ethaniz.github.io',
+      owner: 'ethaniz',
+      admin: ['ethaniz'],
+      id: '40fc22d3bbd301fd6230032fb1d3b1a0',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>

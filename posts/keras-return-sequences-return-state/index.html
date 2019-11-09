@@ -66,7 +66,7 @@
 <meta property="og:image" content="https://i.loli.net/2019/09/19/ZTChqXdSywmJYPk.jpg">
 <meta property="og:image" content="https://i.loli.net/2019/09/19/k4U3AgjmeE97x8y.jpg">
 <meta property="og:image" content="https://i.loli.net/2019/09/19/4PMajuzCGpyShWt.png">
-<meta property="og:updated_time" content="2019-09-25T10:22:23.634Z">
+<meta property="og:updated_time" content="2019-11-09T08:00:13.231Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Keras中return_sequences和return_state有什么用？">
 <meta name="twitter:description" content="Photo by Jon Tyson on Unsplash 前言CNN和RNN，作为深度学习的两大护法，促进了深度学习近几年在Computer Vision、NLP等领域席卷全世界。相比CNN，RNN其实更为“骨骼精奇”，它开创性的递归网络结构，让模型具有了“记忆”，使得我们向着“AI”更近了一步。虽然最近各种Transformer结构有了超越RNN之势，但是我依然觉得RNN是非常值得学习和发">
@@ -327,10 +327,10 @@
       
         <p><img src="https://i.loli.net/2019/09/19/ZTChqXdSywmJYPk.jpg" alt> Photo by Jon Tyson on Unsplash</p>
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CNN和RNN，作为深度学习的两大护法，促进了深度学习近几年在Computer Vision、NLP等领域席卷全世界。相比CNN，RNN其实更为“骨骼精奇”，它开创性的递归网络结构，让模型具有了“记忆”，使得我们向着“AI”更近了一步。虽然最近各种Transformer结构有了超越RNN之势，但是我依然觉得RNN是非常值得学习和发展的。</p>
-<p>今天，我们以LSTM为例，来谈一个RNN中的一个具体的问题。我们知道，在Keras的LSTM实现中，有两个参数<code>return_sequences</code>和<code>return_state</code>。这两个参数的实际意义是什么？在什么场景下会用到呢？</p>
-<p>PS：<code>Keras</code>是我最喜爱的深度学习框架了，其API的设计非常精妙和优雅，François Chollet是不愧是大师中的大师。相比传统的<code>Tensorflow</code>和<code>PyTorch</code>，Keras的API才是真正的“Deep Learning for Human”。另外，看到<code>Tensorflow 2.0</code>也开始以<code>tf.keras</code>作为第一公民，我非常欣慰。关于我对这几个框架的理解，后面再以专题文章和大家分享。</p>
 <a id="more"></a>
 
+<p>今天，我们以LSTM为例，来谈一个RNN中的一个具体的问题。我们知道，在Keras的LSTM实现中，有两个参数<code>return_sequences</code>和<code>return_state</code>。这两个参数的实际意义是什么？在什么场景下会用到呢？</p>
+<p>PS：<code>Keras</code>是我最喜爱的深度学习框架了，其API的设计非常精妙和优雅，François Chollet是不愧是大师中的大师。相比传统的<code>Tensorflow</code>和<code>PyTorch</code>，Keras的API才是真正的“Deep Learning for Human”。另外，看到<code>Tensorflow 2.0</code>也开始以<code>tf.keras</code>作为第一公民，我非常欣慰。关于我对这几个框架的理解，后面再以专题文章和大家分享。</p>
 <hr>
 <h2 id="LSTM介绍"><a href="#LSTM介绍" class="headerlink" title="LSTM介绍"></a>LSTM介绍</h2><blockquote>
 <p>Long Short Term Memory networks – usually just called “LSTMs” – are a special kind of RNN, capable of learning long-term dependencies. They were introduced by <a href="http://www.bioinf.jku.at/publications/older/2604.pdf" target="_blank" rel="noopener">Hochreiter &amp; Schmidhuber (1997)</a> , and were refined and popularized by many people in following work.They work tremendously well on a large variety of problems, and are now widely used.</p>
@@ -503,7 +503,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -516,7 +516,7 @@
             <a href="/categories/">
           
         
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -529,7 +529,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
