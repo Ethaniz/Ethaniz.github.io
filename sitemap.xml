@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.aifun.xyz/posts/neo4j-lookalike-part1/</loc>
+    
+    <lastmod>2019-12-22T13:13:04.372Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.aifun.xyz/posts/deep-learning-in-recommendation-system/</loc>
     
     <lastmod>2019-11-09T08:03:24.500Z</lastmod>
@@ -93,13 +100,6 @@
   </url>
   
   <url>
-    <loc>https://www.aifun.xyz/user/index.html</loc>
-    
-    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.aifun.xyz/logout/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
@@ -107,21 +107,7 @@
   </url>
   
   <url>
-    <loc>https://www.aifun.xyz/members/index.html</loc>
-    
-    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.aifun.xyz/register/index.html</loc>
-    
-    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.aifun.xyz/privacy-policy/index.html</loc>
+    <loc>https://www.aifun.xyz/account/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
@@ -135,7 +121,14 @@
   </url>
   
   <url>
-    <loc>https://www.aifun.xyz/sample-page/index.html</loc>
+    <loc>https://www.aifun.xyz/privacy-policy/index.html</loc>
+    
+    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.aifun.xyz/register/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
@@ -149,7 +142,21 @@
   </url>
   
   <url>
-    <loc>https://www.aifun.xyz/account/index.html</loc>
+    <loc>https://www.aifun.xyz/user/index.html</loc>
+    
+    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.aifun.xyz/sample-page/index.html</loc>
+    
+    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.aifun.xyz/members/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     

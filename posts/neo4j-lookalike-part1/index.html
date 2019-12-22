@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="起源精准营销一直是大数据技术商业落地的重要场景之一。通过对用户的数据分析，找到精准的受众群来营销，可以在节省营销预算的前提下大幅提升转化率，使得数据产生价值。">
+<meta name="keywords" content="Neo4J">
+<meta property="og:type" content="article">
+<meta property="og:title" content="教你用neo4j做lookalike（上）">
+<meta property="og:url" content="https://www.aifun.xyz/posts/neo4j-lookalike-part1/index.html">
+<meta property="og:site_name" content="机器拾趣">
+<meta property="og:description" content="起源精准营销一直是大数据技术商业落地的重要场景之一。通过对用户的数据分析，找到精准的受众群来营销，可以在节省营销预算的前提下大幅提升转化率，使得数据产生价值。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i.loli.net/2019/12/22/VK5pGS9rjLlNZa8.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/12/22/WfuNp3v7hdm18Xa.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/12/22/Kdc9RwT7VxCBhjm.png">
+<meta property="og:image" content="https://i.loli.net/2019/12/22/rXBuNciZHwshz9Y.png">
+<meta property="og:image" content="https://i.loli.net/2019/12/22/oQ2y4vYFpwi8hzM.png">
+<meta property="og:updated_time" content="2019-12-22T13:13:04.372Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="教你用neo4j做lookalike（上）">
+<meta name="twitter:description" content="起源精准营销一直是大数据技术商业落地的重要场景之一。通过对用户的数据分析，找到精准的受众群来营销，可以在节省营销预算的前提下大幅提升转化率，使得数据产生价值。">
+<meta name="twitter:image" content="https://i.loli.net/2019/12/22/VK5pGS9rjLlNZa8.jpg">
+  <link rel="canonical" href="https://www.aifun.xyz/posts/neo4j-lookalike-part1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>教你用neo4j做lookalike（上） | 机器拾趣</title>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147618128-2"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !true) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147618128-2');
+    }
+  </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">机器拾趣</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">冰冷机器如何理解世事无常</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://www.aifun.xyz/posts/neo4j-lookalike-part1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="异尘">
+      <meta itemprop="description" content="现居成都，多年大数据与机器学习经验，目前任某互联网金融公司算法专家">
+      <meta itemprop="image" content="https://i.loli.net/2019/09/26/anrCA26pmV3R94F.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="机器拾趣">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">教你用neo4j做lookalike（上）
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-22 20:57:43" itemprop="dateCreated datePublished" datetime="2019-12-22T20:57:43+08:00">2019-12-22</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/Knowledge-Graph/" itemprop="url" rel="index"><span itemprop="name">Knowledge Graph</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://i.loli.net/2019/12/22/VK5pGS9rjLlNZa8.jpg" alt></p>
+<h2 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h2><p>精准营销一直是大数据技术商业落地的重要场景之一。通过对用户的数据分析，找到精准的受众群来营销，可以在节省营销预算的前提下大幅提升转化率，使得数据产生价值。</p>
+<a id="more"></a>
+
+<p>在精准营销的各种技术中，有个很时髦的技术叫做“lookalike”。</p>
+<p>什么是“lookalike”呢？</p>
+<blockquote>
+<p>Lookalike技术基于种子用户画像和社交关系链寻找相似的受众，即在大量用户群中选择一组特定的种子（即有转化行为的）受众，包括但不局限于点击、下载、安装、激活，然后根据实际需求，筛选、识别、拓展更多相似受众，进一步引发更大客户量级的倍增。 </p>
+</blockquote>
+<p>我们先来看看lookalike之前，我们怎么来通过大数据精准营销。</p>
+<p>首先，假定通过前期的大数据建设，我们已经有了比较完备的<code>用户画像标签库</code>，包括用户性别、年龄、偏好等等。我们的业务人员根据业务经验，直接可以根据标签规则来筛选出用户群。举个例子，对于护肤品来说，用户群一般就是“18-40岁，女性，美妆偏好”等。筛选出来的潜在用户群，可以直接进行广告推送等触达，转化率肯定比广撒网更高，而且花费的成本还低。</p>
+<p>但是，这种方式仍然有局限性。其一，如果业务人员无法准确定位人群特征怎么办？其二，如果需要对100w人投放，标签筛选只选出了30w人怎么办？</p>
+<p>2012年，Facebook在广告领域开始应用<code>定制化受众</code>（Facebook CustomAudiences）功能，这个功能可以让企业不用再选择标签，包括用户的基本信息、兴趣等，企业需要做的只是上传一批目前已有的用户或者感兴趣的一批用户，剩下的工作，就由<code>受众发现</code>功能来完成。</p>
+<p> 像Facebook这样通过一群已有的用户发现并扩展出其他用户的算法就叫Lookalike。各个大厂纷纷在这个功能上发力，典型的包括腾讯在微信端的广告推荐的应用等。具体实现的技术也有多种，有基于规则定义的，有机器学习、深度学习来建模的，也有通过社交网络的。可以看到，lookalike是基于用户画像之上的、更直接的一种大数据应用。</p>
+<p><img src="https://i.loli.net/2019/12/22/WfuNp3v7hdm18Xa.jpg" alt></p>
+<p>今天，我们来介绍一种很优雅的方式：通过neo4j图数据库来实现lookalike。</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>lookalike，即<code>相似人群扩展</code>。基本原理就是根据各种维度，找到跟<code>种子用户群</code>相似的人群。本文从最常见的几种场景入手，将维度大致分为基于联系人扩散、基于地理位置扩散、基于行为扩散。当然，实际生产中的扩散规则需要根据业务场景来仔细设计。</p>
+<p>用户数据，特别是<code>社交网络</code>上的用户数据，天然是图结构。<code>节点</code>是用户，<code>边</code>就是好友或联系人。使用图数据库，在选定某用户的情况下，根据社交关系来扩散，可以取得非常高效的查询效果。同样，我们把用户与用户之间的地理距离做成边、用户与用户之间的余弦相似度做成边，那么相似的查询接口，可以把这三种扩散关系快速得到。</p>
+<p>我们的图数据<code>schema</code>可以见下图：</p>
+<p><img src="https://i.loli.net/2019/12/22/Kdc9RwT7VxCBhjm.png" alt></p>
+<p>Person表示用户<code>实体</code>，Phone表示手机号码<code>实体</code>，City表示城市<code>实体</code>。</p>
+<p>用户和手机号之间有HAS_PHONE和HAS_CONTACT<code>关系</code>，分别表示拥有手机号和联系人号码。</p>
+<p>用户和城市之间有IN_CITY<code>关系</code>，表示所在城市。</p>
+<p>用户和用户之间有SIMILAR<code>关系</code>，表示余弦相似。</p>
+<h2 id="数据"><a href="#数据" class="headerlink" title="数据"></a>数据</h2><p>我们的数据直接来源于<code>用户画像</code>，一般是存储在<code>ElasticSearch</code>或者<code>HBase</code>之上，以用户id为rowkey，每个标签为一个特征，标签值为特征值。标签包括静态属性如年龄、性别、手机号、联系人等，动态属性如gps位置、最近的点击行为、下载行为、购买行为等等。</p>
+<p>我们将原始数据导入<code>Pandas</code>，得到一个shape为（9550, 428）的DataFrame，即共有9550个用户，428个特征。</p>
+<p>接下来是数据处理。处理的目的，是生成实体和关系的csv文件，用于neo4j的数据导入。</p>
+<h4 id="城市实体"><a href="#城市实体" class="headerlink" title="城市实体"></a>城市实体</h4><p>城市实体很简单，取出DataFrame中的所有城市字段，去重即可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">all_city = set(df[<span class="string">'City_Cd'</span>].values)</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'city_nodes.csv'</span>, <span class="string">'w'</span>, newline=<span class="string">''</span>, encoding=<span class="string">'utf-8'</span>) <span class="keyword">as</span> f:</span><br><span class="line">	headers = [<span class="string">'city'</span>]</span><br><span class="line">	f_csv = csv.writer(f)</span><br><span class="line">	f_csv.writerow(headers)</span><br><span class="line">	<span class="keyword">for</span> item <span class="keyword">in</span> all_city:</span><br><span class="line">    	f_csv.writerow([item])</span><br></pre></td></tr></table></figure>
+
+<h4 id="手机号实体"><a href="#手机号实体" class="headerlink" title="手机号实体"></a>手机号实体</h4><p>手机号码分别存储在用户手机号及联系人手机号字段里，也是全部取出再去重：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">all_phone_num = set(np.concatenate((df[<span class="string">'Mobile_Num'</span>].values,</span><br><span class="line">                                           df[<span class="string">'Contact_Tel'</span>].values)))</span><br></pre></td></tr></table></figure>
+
+<h4 id="用户实体"><a href="#用户实体" class="headerlink" title="用户实体"></a>用户实体</h4><p>用户实体比较复杂。首先用户id，用户姓名，gps经纬度都可以直接得到。要做用户之间的余弦相似度，得把用户行为表示成一定维度的向量才行。这里就牵涉了基本的机器学习数据预处理操作。</p>
+<p>首先我们将所需要的用户行为相关的特征字段分为连续数值型(numerical)和类别型(categorical)。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data_action_categorical = df[action_columns_string]</span><br><span class="line">data_action_numerical = df[action_columns_float]</span><br></pre></td></tr></table></figure>
+
+<p>针对categorical类型，需要做<code>OneHot</code>处理，我们直接用sklearn的api。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">action_oh_enc = OneHotEncoder(handle_unknown=<span class="string">'ignore'</span>)</span><br><span class="line">data_action_categorical_onehot = action_oh_enc.fit_transform(data_action_categorical)</span><br></pre></td></tr></table></figure>
+
+<p>针对numerical类型，需要做<code>归一化</code>，这样才能把每个维度的特征放在统一尺度来进行相似度运算。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mms_action = MinMaxScaler()</span><br><span class="line">data_action_numerical = mms_action.fit_transform(data_action_numerical)</span><br></pre></td></tr></table></figure>
+
+<p>然后就可以把它们拼接在一起。由于sklearn的OneHot生成的是sparse矩阵，需要用到scipy.sparse的hstack。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">df_action = hstack([data_action_numerical, data_action_categorical_onehot])</span><br><span class="line"><span class="comment"># df_action.shape (9550, 99)</span></span><br></pre></td></tr></table></figure>
+
+<p>这样，每个用户的行为数据被处理成一个99维的向量，可以进行余弦相似度运算了。在实际工作中，考虑到计算资源和效率的问题，可以使用PCA等算法将这个向量继续降维，具体可参考<a href="https://aifun.xyz/posts/numpy-pca-svd/" target="_blank" rel="noopener">使用numpy来理解PCA和SVD</a>。</p>
+<p>然后就是用户实体csv的创建了。除了常规的属性，我们把用户行为向量作为embedding属性存储。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open(<span class="string">'nodes.csv'</span>, <span class="string">'w'</span>, newline=<span class="string">''</span>, encoding=<span class="string">'utf-8'</span>) <span class="keyword">as</span> f:</span><br><span class="line">	headers = [<span class="string">'tree_id'</span>, <span class="string">'cust_num'</span>, <span class="string">'cust_name'</span>, <span class="string">'longitude'</span>, <span class="string">'latitude'</span>, <span class="string">'embedding'</span>]</span><br><span class="line">	f_csv = csv.writer(f)</span><br><span class="line">	f_csv.writerow(headers)</span><br><span class="line">	index = <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> item <span class="keyword">in</span> df.itertuples():</span><br><span class="line">    	f_csv.writerow([item[<span class="number">0</span>], item[<span class="number">1</span>], item[<span class="number">2</span>], item[<span class="number">3</span>], item[<span class="number">4</span>], list(df_action[index])])</span><br><span class="line">    	index += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>可以大致看一下生成的csv的情况：</p>
+<p><img src="https://i.loli.net/2019/12/22/rXBuNciZHwshz9Y.png" alt></p>
+<h4 id="HAS-PHONE关系"><a href="#HAS-PHONE关系" class="headerlink" title="HAS_PHONE关系"></a>HAS_PHONE关系</h4><p>这个比较简单，我们将csv分为两列，第一列为用户id，第二列为手机号</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open(<span class="string">'has_phone_relations.csv'</span>, <span class="string">'w'</span>, newline=<span class="string">''</span>, encoding=<span class="string">'utf-8'</span>) <span class="keyword">as</span> f:</span><br><span class="line">	headers = [<span class="string">'cust_num'</span>, <span class="string">'phone_num'</span>]</span><br><span class="line">	f_csv = csv.writer(f)</span><br><span class="line">	f_csv.writerow(headers)</span><br><span class="line">	<span class="keyword">for</span> item <span class="keyword">in</span> df.itertuples():</span><br><span class="line">    	f_csv.writerow([item[<span class="number">1</span>], item[<span class="number">3</span>]])</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2019/12/22/oQ2y4vYFpwi8hzM.png" alt></p>
+<p>同理，我们可以得到HAS_CONTACT关系、IN_CITY关系，分别得到相应的CSV。</p>
+<p>至此，数据处理已基本完毕，剩下的任务就是把csv数据导入neo4j，开始我们的图数据之旅，且听下回分解。</p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="异尘 wechat" style="width: 200px; max-width: 100%;">
+  <div>欢迎您扫一扫上面的微信公众号，订阅我的博客</div>
+</div>
+
+      
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Neo4J/" rel="tag"><i class="fa fa-tag"></i> Neo4J</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/posts/deep-learning-in-recommendation-system/" rel="next" title="且看他深度学习兵分三路，直指推荐系统">
+                  <i class="fa fa-chevron-left"></i> 且看他深度学习兵分三路，直指推荐系统
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#起源"><span class="nav-number">1.</span> <span class="nav-text">起源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#思路"><span class="nav-number">2.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据"><span class="nav-number">3.</span> <span class="nav-text">数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#城市实体"><span class="nav-number">3.0.1.</span> <span class="nav-text">城市实体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#手机号实体"><span class="nav-number">3.0.2.</span> <span class="nav-text">手机号实体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#用户实体"><span class="nav-number">3.0.3.</span> <span class="nav-text">用户实体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HAS-PHONE关系"><span class="nav-number">3.0.4.</span> <span class="nav-text">HAS_PHONE关系</span></a></li></ol></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="https://i.loli.net/2019/09/26/anrCA26pmV3R94F.png"
+      alt="异尘">
+  <p class="site-author-name" itemprop="name">异尘</p>
+  <div class="site-description" itemprop="description">现居成都，多年大数据与机器学习经验，目前任某互联网金融公司算法专家</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://weibo.com/aifunxyz" title="Weibo &rarr; https://weibo.com/aifunxyz" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.zhihu.com/people/yi-chen-25-73" title="知乎 &rarr; https://www.zhihu.com/people/yi-chen-25-73" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>知乎</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-laptop"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">异尘</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '339ef61c48976b95fd3b',
+      clientSecret: '2b1314629cd3ff31ce9ed5388c5d6e72c4465950',
+      repo: 'ethaniz.github.io',
+      owner: 'ethaniz',
+      admin: ['ethaniz'],
+      id: 'bf1fd2bc0ebbaa701b9ce3d766e2db75',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>
