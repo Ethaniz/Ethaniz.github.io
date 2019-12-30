@@ -55,13 +55,13 @@
   };
 </script>
 
-  <meta name="description" content="Neo4J数据导入这里假设大家对neo4j已经有了基本的了解。不清楚的同学可以参考下我之前写的文章手把手教你快速入门知识图谱 - Neo4J教程。">
+  <meta name="description" content="在上文中，我们已经做好了基本的数据预处理，并生成了供Neo4J导入的csv格式数据。在这节中，让我们把数据导入Neo4J，开始我们的图数据库之旅。">
 <meta name="keywords" content="Neo4J">
 <meta property="og:type" content="article">
 <meta property="og:title" content="教你用neo4j做lookalike（下）">
 <meta property="og:url" content="https://www.aifun.xyz/posts/neo4j-lookalike-part2/index.html">
 <meta property="og:site_name" content="机器拾趣">
-<meta property="og:description" content="Neo4J数据导入这里假设大家对neo4j已经有了基本的了解。不清楚的同学可以参考下我之前写的文章手把手教你快速入门知识图谱 - Neo4J教程。">
+<meta property="og:description" content="在上文中，我们已经做好了基本的数据预处理，并生成了供Neo4J导入的csv格式数据。在这节中，让我们把数据导入Neo4J，开始我们的图数据库之旅。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://i.loli.net/2019/12/22/VK5pGS9rjLlNZa8.jpg">
 <meta property="og:image" content="https://i.loli.net/2019/12/30/dH2IUsEuv5ifS7z.png">
@@ -70,10 +70,10 @@
 <meta property="og:image" content="https://i.loli.net/2019/12/30/HWVm7nYGuhAl853.png">
 <meta property="og:image" content="https://i.loli.net/2019/12/30/GewPpNcKLoRiltD.png">
 <meta property="og:image" content="https://i.loli.net/2019/12/30/8RYurvqp4NXBaFb.png">
-<meta property="og:updated_time" content="2019-12-30T12:31:49.547Z">
+<meta property="og:updated_time" content="2019-12-30T12:35:25.294Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="教你用neo4j做lookalike（下）">
-<meta name="twitter:description" content="Neo4J数据导入这里假设大家对neo4j已经有了基本的了解。不清楚的同学可以参考下我之前写的文章手把手教你快速入门知识图谱 - Neo4J教程。">
+<meta name="twitter:description" content="在上文中，我们已经做好了基本的数据预处理，并生成了供Neo4J导入的csv格式数据。在这节中，让我们把数据导入Neo4J，开始我们的图数据库之旅。">
 <meta name="twitter:image" content="https://i.loli.net/2019/12/22/VK5pGS9rjLlNZa8.jpg">
   <link rel="canonical" href="https://www.aifun.xyz/posts/neo4j-lookalike-part2/">
 
@@ -330,9 +330,10 @@
 
       
         <p><img src="https://i.loli.net/2019/12/22/VK5pGS9rjLlNZa8.jpg" alt></p>
-<h2 id="Neo4J数据导入"><a href="#Neo4J数据导入" class="headerlink" title="Neo4J数据导入"></a>Neo4J数据导入</h2><p>这里假设大家对neo4j已经有了基本的了解。不清楚的同学可以参考下我之前写的文章<a href="https://aifun.xyz/posts/knowledge-graph-neo4j-toturial/" target="_blank" rel="noopener">手把手教你快速入门知识图谱 - Neo4J教程</a>。</p>
+<p>在上文中，我们已经做好了基本的数据预处理，并生成了供Neo4J导入的csv格式数据。在这节中，让我们把数据导入Neo4J，开始我们的图数据库之旅。</p>
 <a id="more"></a>
 
+<h2 id="Neo4J数据导入"><a href="#Neo4J数据导入" class="headerlink" title="Neo4J数据导入"></a>Neo4J数据导入</h2><p>这里假设大家对neo4j已经有了基本的了解。不清楚的同学可以参考下我之前写的文章<a href="https://aifun.xyz/posts/knowledge-graph-neo4j-toturial/" target="_blank" rel="noopener">手把手教你快速入门知识图谱 - Neo4J教程</a>。</p>
 <p>一般来说，neo4j的数据导入有以下几种方式：</p>
 <ul>
 <li>CYPHER CREATE。这种方式可以实时插入，但是速度和吞吐量都很慢，只适合实验场景。</li>
