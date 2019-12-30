@@ -1,3 +1,4 @@
+https://www.aifun.xyz/posts/neo4j-lookalike-part2/
 https://www.aifun.xyz/posts/neo4j-lookalike-part1/
 https://www.aifun.xyz/posts/deep-learning-in-recommendation-system/
 https://www.aifun.xyz/posts/cnn-shift-invariant/

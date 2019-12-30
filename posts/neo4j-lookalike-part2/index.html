@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Neo4J数据导入这里假设大家对neo4j已经有了基本的了解。不清楚的同学可以参考下我之前写的文章手把手教你快速入门知识图谱 - Neo4J教程。">
+<meta name="keywords" content="Neo4J">
+<meta property="og:type" content="article">
+<meta property="og:title" content="教你用neo4j做lookalike（下）">
+<meta property="og:url" content="https://www.aifun.xyz/posts/neo4j-lookalike-part2/index.html">
+<meta property="og:site_name" content="机器拾趣">
+<meta property="og:description" content="Neo4J数据导入这里假设大家对neo4j已经有了基本的了解。不清楚的同学可以参考下我之前写的文章手把手教你快速入门知识图谱 - Neo4J教程。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i.loli.net/2019/12/22/VK5pGS9rjLlNZa8.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/12/30/dH2IUsEuv5ifS7z.png">
+<meta property="og:image" content="https://i.loli.net/2019/12/30/WANtsb5e9xwXSYI.png">
+<meta property="og:image" content="https://i.loli.net/2019/12/30/zL6OZrv1GCaKiWq.png">
+<meta property="og:image" content="https://i.loli.net/2019/12/30/HWVm7nYGuhAl853.png">
+<meta property="og:image" content="https://i.loli.net/2019/12/30/GewPpNcKLoRiltD.png">
+<meta property="og:image" content="https://i.loli.net/2019/12/30/8RYurvqp4NXBaFb.png">
+<meta property="og:updated_time" content="2019-12-30T12:26:53.059Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="教你用neo4j做lookalike（下）">
+<meta name="twitter:description" content="Neo4J数据导入这里假设大家对neo4j已经有了基本的了解。不清楚的同学可以参考下我之前写的文章手把手教你快速入门知识图谱 - Neo4J教程。">
+<meta name="twitter:image" content="https://i.loli.net/2019/12/22/VK5pGS9rjLlNZa8.jpg">
+  <link rel="canonical" href="https://www.aifun.xyz/posts/neo4j-lookalike-part2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>教你用neo4j做lookalike（下） | 机器拾趣</title>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147618128-2"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !true) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147618128-2');
+    }
+  </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">机器拾趣</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">冰冷机器如何理解世事无常</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://www.aifun.xyz/posts/neo4j-lookalike-part2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="异尘">
+      <meta itemprop="description" content="现居成都，多年大数据与机器学习经验，目前任某互联网金融公司算法专家">
+      <meta itemprop="image" content="https://i.loli.net/2019/09/26/anrCA26pmV3R94F.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="机器拾趣">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">教你用neo4j做lookalike（下）
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-30 20:22:42" itemprop="dateCreated datePublished" datetime="2019-12-30T20:22:42+08:00">2019-12-30</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/Knowledge-Graph/" itemprop="url" rel="index"><span itemprop="name">Knowledge Graph</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://i.loli.net/2019/12/22/VK5pGS9rjLlNZa8.jpg" alt></p>
+<h2 id="Neo4J数据导入"><a href="#Neo4J数据导入" class="headerlink" title="Neo4J数据导入"></a>Neo4J数据导入</h2><p>这里假设大家对neo4j已经有了基本的了解。不清楚的同学可以参考下我之前写的文章<a href="https://aifun.xyz/posts/knowledge-graph-neo4j-toturial/" target="_blank" rel="noopener">手把手教你快速入门知识图谱 - Neo4J教程</a>。</p>
+<a id="more"></a>
+
+<p>一般来说，neo4j的数据导入有以下几种方式：</p>
+<ul>
+<li>CYPHER CREATE。这种方式可以实时插入，但是速度和吞吐量都很慢，只适合实验场景。</li>
+<li>Java或Python API。这种方式适合小数据量的实时插入，实现一定程度上的增删改查。</li>
+<li>CYPHER LOAD CSV。这种方式速度就好很多，适合中等数据量的批量插入。</li>
+<li>Neo4j-import。这种方式速度是最快的，但缺点是插入的时候必须停止Neo4j，且只能生成新的数据库，因此只适合大数据量的初始化。</li>
+</ul>
+<p>我们这里采用的是CYPHER LOAD CSV的方式。在上一章节中，已经生成好了相应的CSV，下面就是调用CYPHER语句将数据导入。这里有2个小trick：</p>
+<ol>
+<li>我们是先导入节点node，然后再导入关系relationship。导入关系的逻辑，是先查找出相应的节点，再建立关系，因此为了查询速度的优化，我们要给节点的查找字段添加索引，如：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE INDEX ON :Person(cust_num)</span><br><span class="line">CREATE INDEX ON :Phone(phone_num)</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>另外，索引建立好后，记得运行<code>:schema</code>确保索引已生效。</p>
+<ol start="2">
+<li>如果搭建neo4j的服务器性能有限，要避免jvm虚拟机在批量插入时内存不足，需要使用以下语句进行批量的事务提交<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">USING PERIODIC COMMIT 1000</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="节点导入"><a href="#节点导入" class="headerlink" title="节点导入"></a>节点导入</h2><p>接下来就是LOAD客户节点了，注意这里有个操作，是将CSV中格式为STRING的embedding list转化为FLOAT list。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">LOAD CSV WITH HEADERS FROM &quot;file:///var/lib/neo4j/import/nodes.csv&quot;</span><br><span class="line">AS line</span><br><span class="line">WITH line, split(substring(line.embedding, 1, length(line.embedding)-2), &quot;,&quot;) as ems</span><br><span class="line">CREATE (:Person &#123;cust_num:line.cust_num, cust_name:line.cust_name, longitude:TOFLOAT(line.longitude), latitude:TOFLOAT(line.latitude), embedding:[item in ems | TOFLOAT(item)]&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>导入成功后，在neo4j里面查看一下，Person节点信息如下：</p>
+<p><img src="https://i.loli.net/2019/12/30/dH2IUsEuv5ifS7z.png" alt></p>
+<p>然后是手机号节点及城市节点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">LOAD CSV WITH HEADERS FROM &quot;file:///var/lib/neo4j/import/phone_nodes.csv&quot;</span><br><span class="line">AS line</span><br><span class="line">WITH line</span><br><span class="line">CREATE (:Phone &#123;phone_num:line.phone_num&#125;)</span><br><span class="line"></span><br><span class="line">LOAD CSV WITH HEADERS FROM &quot;file:///var/lib/neo4j/import/city_nodes.csv&quot;</span><br><span class="line">AS line</span><br><span class="line">WITH line</span><br><span class="line">CREATE (:City &#123;city_cd:line.city&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="关系导入"><a href="#关系导入" class="headerlink" title="关系导入"></a>关系导入</h3><p>首先是用户拥有手机号的关系：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">LOAD CSV WITH HEADERS FROM &quot;file:///var/lib/neo4j/import/has_phone_relations.csv&quot;</span><br><span class="line">AS line</span><br><span class="line">WITH line</span><br><span class="line">MATCH (f:Person &#123;cust_num: line.cust_num&#125;), (t:Phone &#123;phone_num: line.phone_num&#125;)</span><br><span class="line">MERGE (f)-[r:HAS_PHONE]-&gt;(t)</span><br><span class="line">RETURN count(r)</span><br></pre></td></tr></table></figure>
+
+<p>关系建立好后如图：</p>
+<p><img src="https://i.loli.net/2019/12/30/WANtsb5e9xwXSYI.png" alt></p>
+<p>然后以此类推，分别是用户联系人的关系和用户所在城市的关系：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">LOAD CSV WITH HEADERS FROM &quot;file:///var/lib/neo4j/import/has_contact_relations.csv&quot;</span><br><span class="line">AS line</span><br><span class="line">WITH line</span><br><span class="line">MATCH (f:Person &#123;cust_num: line.cust_num&#125;), (t:Phone &#123;phone_num: line.phone_num&#125;)</span><br><span class="line">MERGE (f)-[r:HAS_CONTACT]-&gt;(t)</span><br><span class="line">RETURN count(r)</span><br><span class="line"></span><br><span class="line">LOAD CSV WITH HEADERS FROM &quot;file:///var/lib/neo4j/import/in_city_relations.csv&quot;</span><br><span class="line">AS line</span><br><span class="line">WITH line</span><br><span class="line">MATCH (f:Person &#123;cust_num: line.cust_num&#125;), (t:City &#123;city_cd: line.city&#125;)</span><br><span class="line">MERGE (f)-[r:IN_CITY]-&gt;(t)</span><br><span class="line">RETURN count(r)</span><br></pre></td></tr></table></figure>
+
+<h2 id="lookalike实现"><a href="#lookalike实现" class="headerlink" title="lookalike实现"></a>lookalike实现</h2><p>图谱建立好以后，就可以开始应用了。我们来看看在Neo4J中是如何优雅的实现的。</p>
+<h3 id="联系人扩散"><a href="#联系人扩散" class="headerlink" title="联系人扩散"></a>联系人扩散</h3><p>联系人扩散的逻辑，就是根据种子用户，找到这些用户的联系人（父母、配偶、朋友等）。在图数据库里，可以非常自然的用以下语句实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH (n:Person &#123;cust_num: &quot;3814&quot;&#125;)-[r:HAS_CONTACT]-&gt;(p:Phone)&lt;-[q:HAS_PHONE]-(m:Person)</span><br><span class="line">WHERE n&lt;&gt;m</span><br><span class="line">RETURN n, r, p, q, m</span><br></pre></td></tr></table></figure>
+
+<p>查询结果如下：</p>
+<p><img src="https://i.loli.net/2019/12/30/zL6OZrv1GCaKiWq.png" alt></p>
+<p>查询结果非常快，响应速度是毫秒级，而且这个速度跟数据量级基本关系不大。这就是图数据库相比传统的RDMS关系型数据库的优势。注意这里是2级关系的查询，关系级数越大，优势越明显。这是因为RDMS中对于这种关系的查找，需要全量数据的join，这是非常消耗计算资源的。而在图数据库中，关系作为“第一公民”，只会在需要查询的节点上做计算，不涉及join，因此速度非常快，且基本跟数据量无关。</p>
+<h3 id="地理位置扩散"><a href="#地理位置扩散" class="headerlink" title="地理位置扩散"></a>地理位置扩散</h3><p>地理位置扩散，难度会稍大一些了。业务逻辑是找到跟种子用户地理位置相近的用户，也就是说，根据GPS经纬度，找到某用户物理距离最近的一群用户。这就涉及了所有数据计算中的“噩梦”–笛卡尔积。</p>
+<p>通过图数据库，我们可以在一定程度上预先减少笛卡尔积的运算量。还记得我们有个“IN_CITY”的关系么？我们可以预先查询出用户所在城市的其他用户，只在这些用户之间比较距离即可。如果数据做得细，可以增加城区、街道、甚至小区，这样计算量就更小了。</p>
+<p>另外，根据两点的经纬度算物理距离，neo4j中也提供直接的函数，不用自己来写了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">match (n1:Person &#123;cust_num:&quot;200&quot;&#125;)-[r:IN_CITY]-&gt;(p:City)&lt;-[q:IN_CITY]-(n2:Person)</span><br><span class="line">where n1&lt;&gt;n2</span><br><span class="line">with n1, n2, point(&#123;longitude:n1.longitude, latitude:n1.latitude&#125;) as p1,</span><br><span class="line">point(&#123;longitude:n2.longitude, latitude:n2.latitude&#125;) as p2</span><br><span class="line">return n1.cust_num, distance(p1,p2)/1000 as dist, n2.cust_num</span><br><span class="line">order by dist asc</span><br></pre></td></tr></table></figure>
+
+<p>同样查询速度非常快，并且返回了客户号为200的用户，跟他距离最近的用户号及公里数。</p>
+<p><img src="https://i.loli.net/2019/12/30/HWVm7nYGuhAl853.png" alt></p>
+<h3 id="用户行为扩散"><a href="#用户行为扩散" class="headerlink" title="用户行为扩散"></a>用户行为扩散</h3><p>这种扩散方式更加的“AI”。也是各个大厂的lookalike算法体现功力的地方。这里有两个问题，一是用户embedding如何生成，二是如何查询。</p>
+<p>对于用户embedding的生成，我们在上文中采用的传统的机器学习的方式，使用已经做好的用户标签库来处理。在这里neo4j的帮助不大，我们不再多说。</p>
+<p>在生成好的用户embedding上查询相近似的用户，这是典型的nearest neighbor场景，同样存在着笛卡尔积的噩梦。由于计算量非常的大，我们不推荐在每次查询时实时计算，而是预先在初始化的时候，把每个用户距离最近的TOP20计算好，动态生成固定关系，然后在服务的时候，只做一次查询操作即可。</p>
+<p>注意这里使用到了neo4j的图算法库algo，下载好相应的jar包如<code>neo4j-graph-algorithms-3.5.13.0-standalone.jar</code>放到neo4j安装目录中的plugins文件夹，然后在conf文件中写入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dbms.security.procedures.unrestricted=algo.*</span><br></pre></td></tr></table></figure>
+
+<p>接下来，就可以用如下CYPHER语句来生成关系了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">match (p:Person)</span><br><span class="line">with &#123;item:id(p), weights:p.embedding&#125; as userData</span><br><span class="line">with collect(userData) as data</span><br><span class="line">CALL algo.similarity.euclidean(data, &#123;</span><br><span class="line">	topK:20, write:true,</span><br><span class="line">    showComputations: true,</span><br><span class="line">    writeRelationshipType: &quot;SIMILAR20&quot;&#125;)</span><br><span class="line">YIELD nodes, similarityPairs, computations</span><br><span class="line">RETURN nodes, apoc.number.format(similarityPairs) as similarityPairs,</span><br><span class="line">apoc.number.format(computations) as computations</span><br></pre></td></tr></table></figure>
+
+<p>这里我们采用了欧氏距离，并且为了演示计算的复杂度，我们把计算量computations也打印出来。</p>
+<p><img src="https://i.loli.net/2019/12/30/GewPpNcKLoRiltD.png" alt></p>
+<p>可以看到，我们的大致有9550个用户，neo4j安装在笔记本电脑的docker中，这条CYPHER语句运行了33秒，生成了19万条关系，计算量是惊人的4500万！</p>
+<p>初始化完成以后，就可以开始查询了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">match (from:Person &#123;cust_num:&quot;200&quot;&#125;)-[r:SIMILAR20]-&gt;(to:Person)</span><br><span class="line">return distinct from, r, to</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2019/12/30/8RYurvqp4NXBaFb.png" alt></p>
+<p>从结果可以看到，迅速返回了客户号为“200”的“客户余”跟他最相似的客户节点，以及这些客户之间的相似度分数。</p>
+<h3 id="批量扩散"><a href="#批量扩散" class="headerlink" title="批量扩散"></a>批量扩散</h3><p>上面几种演示，基本涵盖了常见的扩散方式。实际操作的过程中，需要根据场景、需求，设计好图模型，就能使用neo4j轻松实现lookalike。不过，还有一点就是，上面为了演示方便，都只查询了一个种子用户的情况，正常情况下，都是一批种子，如何实现呢？其实，用neo4j的<code>unwind</code>语句就可以了。比如我们要批量查询5个用户的联系人扩散：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">UNWIND [&quot;0&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;] as x</span><br><span class="line">MATCH (n:Person &#123;cust_num: x&#125;)-[r:HAS_CONTACT]-&gt;(p:Phone)&lt;-[q:HAS_PHONE]-(m:Person)</span><br><span class="line">WHERE n&lt;&gt;m</span><br><span class="line">RETURN m.cust_num</span><br></pre></td></tr></table></figure>
+
+<p><code>unwind</code>语句可以理解为编程语言中的循环，把一个列表中的值依次代入到后续的语句中执行，就可以高效地得到批量的结果。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文以一个实际的案例，分别从联系人扩散、地理位置扩散、用户行为扩散三方面演示了使用neo4j图数据库去做lookalike用户扩散的方法。当然，这里只是demo，在实际的生产环境中，还需要考虑很多工程化的问题，比如：</p>
+<ol>
+<li>用户数据的更新如何导入，是T+1全量，还是实时增量？如果每日T+1，如果解决neo4j批量数据删除与重建？</li>
+<li>当用户数据量达到一定程度，在地理位置扩散中，即使预先选定了城市，数据量也非常大，如何提升查询效率？</li>
+<li>同样当用户量很大时，预先计算用户行为向量相似度的笛卡尔积也非常的大，计算量呈几何级数增长，非常容易内存OOM导致计算失败，如何解决？</li>
+</ol>
+<p>这些具体问题，我们在后续的文章中再来探讨。</p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="异尘 wechat" style="width: 200px; max-width: 100%;">
+  <div>欢迎您扫一扫上面的微信公众号，订阅我的博客</div>
+</div>
+
+      
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Neo4J/" rel="tag"><i class="fa fa-tag"></i> Neo4J</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/posts/neo4j-lookalike-part1/" rel="next" title="教你用neo4j做lookalike（上）">
+                  <i class="fa fa-chevron-left"></i> 教你用neo4j做lookalike（上）
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Neo4J数据导入"><span class="nav-number">1.</span> <span class="nav-text">Neo4J数据导入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#节点导入"><span class="nav-number">2.</span> <span class="nav-text">节点导入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#关系导入"><span class="nav-number">2.1.</span> <span class="nav-text">关系导入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lookalike实现"><span class="nav-number">3.</span> <span class="nav-text">lookalike实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#联系人扩散"><span class="nav-number">3.1.</span> <span class="nav-text">联系人扩散</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#地理位置扩散"><span class="nav-number">3.2.</span> <span class="nav-text">地理位置扩散</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用户行为扩散"><span class="nav-number">3.3.</span> <span class="nav-text">用户行为扩散</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#批量扩散"><span class="nav-number">3.4.</span> <span class="nav-text">批量扩散</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="https://i.loli.net/2019/09/26/anrCA26pmV3R94F.png"
+      alt="异尘">
+  <p class="site-author-name" itemprop="name">异尘</p>
+  <div class="site-description" itemprop="description">现居成都，多年大数据与机器学习经验，目前任某互联网金融公司算法专家</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://weibo.com/aifunxyz" title="Weibo &rarr; https://weibo.com/aifunxyz" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.zhihu.com/people/yi-chen-25-73" title="知乎 &rarr; https://www.zhihu.com/people/yi-chen-25-73" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>知乎</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-laptop"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">异尘</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '339ef61c48976b95fd3b',
+      clientSecret: '2b1314629cd3ff31ce9ed5388c5d6e72c4465950',
+      repo: 'ethaniz.github.io',
+      owner: 'ethaniz',
+      admin: ['ethaniz'],
+      id: '6c768845f706049cef13acef85b93c4b',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>

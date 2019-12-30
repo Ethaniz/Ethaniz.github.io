@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.aifun.xyz/posts/neo4j-lookalike-part2/</loc>
+    
+    <lastmod>2019-12-30T12:26:53.059Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.aifun.xyz/posts/neo4j-lookalike-part1/</loc>
     
-    <lastmod>2019-12-22T13:13:04.372Z</lastmod>
+    <lastmod>2019-12-30T12:26:48.436Z</lastmod>
     
   </url>
   
@@ -107,13 +114,6 @@
   </url>
   
   <url>
-    <loc>https://www.aifun.xyz/account/index.html</loc>
-    
-    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.aifun.xyz/password-reset/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
@@ -128,6 +128,13 @@
   </url>
   
   <url>
+    <loc>https://www.aifun.xyz/members/index.html</loc>
+    
+    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.aifun.xyz/register/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
@@ -135,14 +142,7 @@
   </url>
   
   <url>
-    <loc>https://www.aifun.xyz/login/index.html</loc>
-    
-    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.aifun.xyz/user/index.html</loc>
+    <loc>https://www.aifun.xyz/account/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
@@ -156,7 +156,14 @@
   </url>
   
   <url>
-    <loc>https://www.aifun.xyz/members/index.html</loc>
+    <loc>https://www.aifun.xyz/user/index.html</loc>
+    
+    <lastmod>2019-09-25T04:04:21.923Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.aifun.xyz/login/index.html</loc>
     
     <lastmod>2019-09-25T04:04:21.923Z</lastmod>
     
