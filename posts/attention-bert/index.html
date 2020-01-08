@@ -76,7 +76,7 @@
 <meta property="og:image" content="https://i.loli.net/2020/01/08/9OYodBSAI3LDuPp.png">
 <meta property="og:image" content="https://i.loli.net/2020/01/09/FEp9lVe3JsIDujn.png">
 <meta property="og:image" content="https://i.loli.net/2020/01/09/OXrT3GNdq6upwht.png">
-<meta property="og:updated_time" content="2020-01-08T16:18:15.709Z">
+<meta property="og:updated_time" content="2020-01-08T16:30:51.955Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="透过Attention看BERT">
 <meta name="twitter:description" content="前言  BERT的全称是Bidirectional Encoder Representation from Transformers，即双向Transformer的Encoder，因为decoder是不能获要预测的信息的。模型的主要创新点都在pre-train方法上，即用了Masked LM和Next Sentence Prediction两种方法分别捕捉词语和句子级别的representati">
@@ -410,6 +410,8 @@
 <p><img src="https://i.loli.net/2020/01/09/FEp9lVe3JsIDujn.png" alt="1577772910692.png"></p>
 <p><img src="https://i.loli.net/2020/01/09/OXrT3GNdq6upwht.png" alt="1577772936612.png"></p>
 <p>可以看到，我们的“多头猛兽”每一个头的关注点都不太一样。有的头关注了“超级差评”、“超级差”等字眼，有的头关注了“服务态度”，有的头关注了“催”等等。</p>
+<p>从直觉来看，这些头关注的字词，应该是关乎这最终情感分类的关注点，即关注一些明显的情感词，但是仔细观察这些attention的值，好像又不完全是这样。就像CNN的feature map一样，这些仍属于深度学习不可解释的部分，attention机制模仿人类的注意力，但是它的实际运作，又不完全跟人类的注意力等同，就像深度学习的神经网络跟实际大脑的神经网络不同一样。</p>
+<p>我相信，NLP的未来一定属于attention。随着我们对attention研究的进一步提升，能够去解释它，去掌控它，那么NLP一定会迎来更高的飞跃。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>可以说，正是因为BERT中Transformer的multi-head“多头”，再加上多个Transformer叠加的多层，如此大的容量容纳了非常多的信息，一方面使得它在理解文字语义方面优势明显，另一方面，也使得“预训练”称为可能。当然，大容量也导致了这个“多头猛兽”是难以驯服的，各个大厂也一度开始“军备竞赛”，模型越来越大，消耗的算力也越来越猛。当然，我们也非常欣慰的看到很多人也在研究如何把BERT简化，让它去适合更多的实际生产场景，如Google自家的<code>ALBERT</code>、HuggingFace的<code>DistillBERT</code>、华为的<code>TinyBERT</code>等。</p>
 <p>我一直认为，基于预训练的迁移学习，是深度学习技术相比传统机器学习最大的优势，也是非常类似人类去学习的一个过程。</p>
 <p>要知道，ImageNet以及各种CNN预训练模型的百花齐放，使得深度学习在计算机视觉领域吊打一切；而BERT的横空出世， fast.ai创始人<a href="https://ruder.io/nlp-imagenet/" target="_blank" rel="noopener">Sebastian Ruder</a>非常兴奋的说：</p>
